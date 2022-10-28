@@ -1,0 +1,51 @@
+name: Build and Deploy Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-mediator:
+        default: true
+        type: boolean
+        required: false
+        description: Build mediator image before deploying
+
+jobs:
+  build_and_deploy:
+    name: Build and Deploy Stack
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        if: inputs.build-mediator == true
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Publish Mediator
+        uses: ./.github/actions/publish-docker-image
+        if: inputs.build-mediator == true
+        with:
+          image-name: ghcr.io/animo/animo-mediator
+          context: .
+          docker-file: Dockerfile
+
+      - name: Deploy Template Stack
+        uses: ./.github/actions/deploy
+        env:
+          WALLET_KEY: ${{ secrets.WALLET_KEY }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
+          POSTGRES_ADMIN_USER: ${{ secrets.POSTGRES_ADMIN_USER }}
+          POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+          POSTGRES_TLS_CA: ${{ secrets.POSTGRES_TLS_CA }}
+        with:
+          envs: WALLET_KEY,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DATABASE_URL,POSTGRES_ADMIN_USER,POSTGRES_ADMIN_PASSWORD,POSTGRES_TLS_CA
+          stack-name: animo-afj-mediator
+          stack-file: ./docker-compose.yml
+          private-key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}

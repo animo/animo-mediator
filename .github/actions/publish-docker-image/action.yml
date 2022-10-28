@@ -1,0 +1,39 @@
+name: Build and Publish Docker Image
+description: Build and Publish a Docker Image to the Github Container Registry
+author: 'Animo Solutions'
+
+inputs:
+  image-name:
+    description: 'Full name of the image. Should be in format ghcr.io/animo/{project}/{optional-specifier}'
+    required: true
+  context:
+    description: Local path of the context where to build from. Defaults to "."
+    required: false
+    default: '.'
+  docker-file:
+    description: Local path to the docker file to build. Default to "Dockerfile"
+    required: false
+    default: 'Dockerfile'
+  secrets:
+    description: Secrets to be passed to the docker build
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      with:
+        images: ${{ inputs.image-name }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ inputs.docker-file }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        secrets: ${{ inputs.secrets }}

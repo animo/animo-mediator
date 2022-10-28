@@ -1,0 +1,43 @@
+name: Validate
+description: Validate the repository on style, type and lint checks as defined in the `yarn validate` script
+author: 'Animo Solutions'
+
+inputs:
+  node-version:
+    description: Which Node.js version will be installed
+    required: true
+  uses-libindy:
+    description: Whether to also install libindy
+    required: false
+
+runs:
+  using: composite
+  steps:
+    # Setup the dependencies
+
+    # Sets up Libindy.
+    # If this is not required, remove the two lines below
+    - name: Setup Libindy
+      if: ${{ inputs.uses-libindy == 'true' }}
+      uses: ./.github/actions/setup-libindy
+
+    # Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    # Installing the project dependencies
+    - name: Install dependencies
+      shell: bash
+      run: yarn install
+
+    # We need to build for validation (it checks the build types)
+    - name: Build
+      shell: bash
+      run: yarn build
+
+    # Validation
+    - name: Running `yarn validate`
+      shell: bash
+      run: yarn validate
