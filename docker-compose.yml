@@ -13,7 +13,7 @@ services:
         # HTTP and WS communication
         traefik.http.routers.animo-mediator.rule: Host(`mediator.dev.animo.id`)
         traefik.http.routers.animo-mediator.entrypoints: web-secure
-        traefik.http.routers.animo-mediator.tls.certresolver: ssl
+        traefik.http.routers.animo-mediator.tls.certresolver: zerossl
         traefik.http.routers.animo-mediator.service: animo-mediator-service
         traefik.http.services.animo-mediator-service.loadbalancer.server.port: 3000
     environment:
