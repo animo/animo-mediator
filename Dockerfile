@@ -56,18 +56,15 @@ FROM base as setup
 # AFJ specifc setup
 WORKDIR /www
 
-# Copy root package files and mediator app package
+# Copy root package files
 COPY package.json /www/package.json
 COPY yarn.lock /www/yarn.lock
-COPY apps/mediator/package.json /www/apps/mediator/package.json
 
-WORKDIR /www/apps/mediator
-
-# Run yarn install with npmrc token as secret
-RUN --mount=type=secret,id=NPM_RC,target=.npmrc yarn install
+# Run yarn install
+RUN yarn install
 
 COPY tsconfig.build.json /www/tsconfig.build.json
-COPY apps/mediator /www/apps/mediator
+COPY . /www
 
 RUN yarn build
 
@@ -75,18 +72,17 @@ FROM base as final
 
 WORKDIR /www
 
-COPY --from=setup /www/apps/mediator/build /www/apps/mediator/build
+COPY --from=setup /www/build /www/build
 COPY --from=setup /tmp/yarn-cache /tmp/yarn-cache
 
 # Copy root package files and mediator app package
 COPY package.json /www/package.json
 COPY yarn.lock /www/yarn.lock
-COPY apps/mediator/package.json /www/apps/mediator/package.json
 
-WORKDIR /www/apps/mediator
+WORKDIR /www
 
-# Run yarn install with npmrc token as secret
-RUN --mount=type=secret,id=NPM_RC,target=.npmrc yarn install --production
+# Run yarn install
+RUN yarn install --production
 
 # Clean cache to reduce image size
 RUN yarn cache clean
