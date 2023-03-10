@@ -4,9 +4,7 @@ import {
   OutOfBandState,
 } from "@aries-framework/core";
 import type { Socket } from "net";
-
 import {
-  InjectionSymbols,
   HttpOutboundTransport,
   Agent,
   WsOutboundTransport,
@@ -16,9 +14,11 @@ import {
   HttpInboundTransport,
   agentDependencies,
   WsInboundTransport,
-  loadPostgresPlugin,
-  WalletScheme,
+  IndySdkPostgresWalletScheme,
+  loadIndySdkPostgresPlugin,
 } from "@aries-framework/node";
+
+import indySdk, { setDefaultLogger } from "indy-sdk";
 
 import express from "express";
 import { writeFileSync } from "fs";
@@ -45,9 +45,10 @@ import {
 } from "./constants";
 import { Logger } from "./logger";
 import { StorageMessageQueueModule } from "./storage/StorageMessageQueueModule";
+import { IndySdkModule } from "@aries-framework/indy-sdk";
 
 if (DEBUG_INDY) {
-  agentDependencies.indy.setDefaultLogger("trace");
+  setDefaultLogger("trace");
 }
 
 export async function createAgent() {
@@ -84,6 +85,9 @@ export async function createAgent() {
     dependencies: agentDependencies,
     modules: {
       StorageModule: new StorageMessageQueueModule(),
+      indySdk: new IndySdkModule({
+        indySdk,
+      }),
     },
   });
 
@@ -158,12 +162,11 @@ function loadPostgres() {
     );
   }
 
-  // // IndyPostgresStorageConfig defines interface for the Postgres plugin configuration.
   const storageConfig = {
     type: "postgres_storage",
     config: {
       url: POSTGRES_DATABASE_URL,
-      wallet_scheme: WalletScheme.DatabasePerWallet,
+      wallet_scheme: IndySdkPostgresWalletScheme.DatabasePerWallet,
       tls_ca: postgresTlsFile,
       tls: "Require",
     },
@@ -175,7 +178,7 @@ function loadPostgres() {
     },
   };
 
-  loadPostgresPlugin(storageConfig.config, storageConfig.credentials);
+  loadIndySdkPostgresPlugin(storageConfig.config, storageConfig.credentials);
 
   return storageConfig;
 }
