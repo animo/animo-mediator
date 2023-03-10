@@ -6,9 +6,9 @@ import {
   InjectionSymbols,
   Repository,
   StorageService,
-} from "@aries-framework/core";
+} from '@aries-framework/core'
 
-import { MessageRecord } from "./MessageRecord";
+import { MessageRecord } from './MessageRecord'
 
 @injectable()
 export class MessageRepository extends Repository<MessageRecord> {
@@ -17,10 +17,10 @@ export class MessageRepository extends Repository<MessageRecord> {
     storageService: StorageService<MessageRecord>,
     eventEmitter: EventEmitter
   ) {
-    super(MessageRecord, storageService, eventEmitter);
+    super(MessageRecord, storageService, eventEmitter)
   }
 
   public findByConnectionId(agentContext: AgentContext, connectionId: string) {
-    return this.findByQuery(agentContext, { connectionId });
+    return this.findByQuery(agentContext, { connectionId })
   }
 }
