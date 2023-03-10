@@ -10,7 +10,7 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aries-framework/anoncreds@0.4.0-alpha.66+c72ba149", "@aries-framework/anoncreds@^0.4.0-alpha.66":
+"@aries-framework/anoncreds@0.4.0-alpha.66+c72ba149":
   version "0.4.0-alpha.66"
   resolved "https://registry.yarnpkg.com/@aries-framework/anoncreds/-/anoncreds-0.4.0-alpha.66.tgz#252706f90099b9446f34db00934e819e8ce4ebc5"
   integrity sha512-cqWKEstWlm7gT4KNeO2gCjgU9DH/9dH9ZDSIX4D4/XZgYFDSrMKq/qR4tvEBtxlKAGTJ3pSIxx9CUAwRjp0EXg==
