@@ -1,7 +1,7 @@
 import type { EncryptedMessage, Logger } from "@aries-framework/core";
 import type { MessageRepository as MessageQueue } from "@aries-framework/core/build/storage/MessageRepository";
 
-import { injectable, AgentConfig } from "@aries-framework/core";
+import { injectable, AgentConfig, AgentContext } from "@aries-framework/core";
 
 import { MessageRecord } from "./MessageRecord";
 import { MessageRepository } from "./MessageRepository";
@@ -10,13 +10,16 @@ import { MessageRepository } from "./MessageRepository";
 export class StorageServiceMessageQueue implements MessageQueue {
   private logger: Logger;
   private messageRepository: MessageRepository;
+  private agentContext: AgentContext;
 
   public constructor(
     agentConfig: AgentConfig,
-    messageRepository: MessageRepository
+    messageRepository: MessageRepository,
+    agentContext: AgentContext
   ) {
     this.logger = agentConfig.logger;
     this.messageRepository = messageRepository;
+    this.agentContext = agentContext;
   }
 
   public async takeFromQueue(
@@ -25,6 +28,7 @@ export class StorageServiceMessageQueue implements MessageQueue {
     keepMessages = false
   ) {
     const messageRecords = await this.messageRepository.findByConnectionId(
+      this.agentContext,
       connectionId
     );
 
@@ -39,7 +43,7 @@ export class StorageServiceMessageQueue implements MessageQueue {
 
     if (!keepMessages) {
       const deletePromises = messageRecordsToReturn.map((message) =>
-        this.messageRepository.deleteById(message.id)
+        this.messageRepository.deleteById(this.agentContext, message.id)
       );
       await Promise.all(deletePromises);
     }
@@ -49,6 +53,7 @@ export class StorageServiceMessageQueue implements MessageQueue {
 
   public async add(connectionId: string, payload: EncryptedMessage) {
     await this.messageRepository.save(
+      this.agentContext,
       new MessageRecord({
         connectionId,
         message: payload,
@@ -58,6 +63,7 @@ export class StorageServiceMessageQueue implements MessageQueue {
 
   public async getAvailableMessageCount(connectionId: string): Promise<number> {
     const messageRecords = await this.messageRepository.findByConnectionId(
+      this.agentContext,
       connectionId
     );
 

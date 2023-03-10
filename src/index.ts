@@ -12,7 +12,7 @@ void createAgent().then(async (agent) => {
 
   // Try to find existing out of band record
   const oobRepo = agent.dependencyManager.resolve(OutOfBandRepository);
-  const outOfBandRecords = await oobRepo.findByQuery({
+  const outOfBandRecords = await oobRepo.findByQuery(agent.context, {
     state: OutOfBandState.AwaitResponse,
     role: OutOfBandRole.Sender,
   });
