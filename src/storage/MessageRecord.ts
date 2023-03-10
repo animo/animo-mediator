@@ -13,7 +13,10 @@ export interface MessageRecordStorageProps {
   message: EncryptedMessage;
 }
 
-export class MessageRecord extends BaseRecord<DefaultMessageRecordTags> {
+export class MessageRecord
+  extends BaseRecord<DefaultMessageRecordTags>
+  implements MessageRecordStorageProps
+{
   public sentTime!: string;
   public connectionId!: string;
   public message!: EncryptedMessage;

@@ -24,7 +24,6 @@ import express from "express";
 import { writeFileSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
-import { container as rootContainer } from "tsyringe";
 import { Server } from "ws";
 
 import {
@@ -45,7 +44,7 @@ import {
   WALLET_NAME,
 } from "./constants";
 import { Logger } from "./logger";
-import { StorageServiceMessageQueue } from "./storage/StorageServiceMessageQueue";
+import { StorageMessageQueueModule } from "./storage/StorageMessageQueueModule";
 
 if (DEBUG_INDY) {
   agentDependencies.indy.setDefaultLogger("trace");
@@ -79,15 +78,14 @@ export async function createAgent() {
     logger,
   };
 
-  // Register custom message queue
-  const container = rootContainer.createChildContainer();
-  container.registerSingleton(
-    InjectionSymbols.MessageRepository,
-    StorageServiceMessageQueue
-  );
-
   // Set up agent
-  const agent = new Agent(agentConfig, agentDependencies, container);
+  const agent = new Agent({
+    config: agentConfig,
+    dependencies: agentDependencies,
+    modules: {
+      StorageModule: new StorageMessageQueueModule(),
+    },
+  });
 
   // Create all transports
   const httpInboundTransport = new HttpInboundTransport({
