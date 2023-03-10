@@ -76,6 +76,7 @@ export async function createAgent() {
     },
     autoAcceptConnections: true,
     autoAcceptMediationRequests: true,
+    autoUpdateStorageOnStartup: true,
     logger,
   };
 
