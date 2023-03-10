@@ -7,7 +7,7 @@ import { MessageRecord } from "./MessageRecord";
 import { MessageRepository } from "./MessageRepository";
 
 @injectable()
-export class StorageServiceMessageQueueApi implements MessageQueue {
+export class StorageServiceMessageQueue implements MessageQueue {
   private logger: Logger;
   private messageRepository: MessageRepository;
   private agentContext: AgentContext;
