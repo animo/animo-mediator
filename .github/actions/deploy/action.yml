@@ -12,7 +12,7 @@ inputs:
   envs:
     description: Which environment variables to pass to the deployment
     required: false
-    default: ""
+    default: ''
   private-key:
     description: private key used for ssh'ing into the server
     required: true

@@ -17,6 +17,9 @@
     "test": "jest",
     "build": "yarn run clean && yarn run compile",
     "clean": "rimraf -rf ./build",
+    "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml|mdx)'",
+    "format": "yarn prettier --write",
+    "check-format": "yarn prettier --list-different",
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "yarn run build",
     "dev": "ts-node dev",
@@ -40,6 +43,7 @@
     "@aries-framework/node": "^0.4.0-alpha.66",
     "express": "^4.18.1",
     "indy-sdk": "^1.16.0-dev-1655",
+    "prettier": "^2.8.4",
     "tslog": "^3.3.3",
     "tsyringe": "^4.7.0",
     "ws": "^8.8.1"
