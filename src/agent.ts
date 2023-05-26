@@ -8,6 +8,7 @@ import {
   WsInboundTransport,
   IndySdkPostgresWalletScheme,
   loadIndySdkPostgresPlugin,
+  IndySdkPostgresStorageConfig,
 } from '@aries-framework/node'
 
 import indySdk, { setDefaultLogger } from 'indy-sdk'
@@ -147,17 +148,11 @@ function loadPostgres() {
     writeFileSync(postgresTlsFile, POSTGRES_TLS_CA)
   }
 
-  if (!postgresTlsFile) {
-    throw new Error('Missing required POSTGRES_TLS_CA_FILE or POSTGRES_TLS_CA environment variable')
-  }
-
   const storageConfig = {
     type: 'postgres_storage',
     config: {
       url: POSTGRES_DATABASE_URL,
       wallet_scheme: IndySdkPostgresWalletScheme.DatabasePerWallet,
-      tls_ca: postgresTlsFile,
-      tls: 'Require',
     },
     credentials: {
       account: POSTGRES_USER,
@@ -165,6 +160,15 @@ function loadPostgres() {
       admin_account: POSTGRES_ADMIN_USER,
       admin_password: POSTGRES_ADMIN_PASSWORD,
     },
+  }
+
+  if (postgresTlsFile) {
+    storageConfig.config = {
+      ...storageConfig.config,
+      // @ts-ignore
+      tls_ca: postgresTlsFile,
+      tls: 'Require',
+    }
   }
 
   loadIndySdkPostgresPlugin(storageConfig.config, storageConfig.credentials)
