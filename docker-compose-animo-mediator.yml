@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   animo-mediator:
-    image: ghcr.io/animo/animo-mediator:main
+    image: ghcr.io/animo/animo-mediator:${IMAGE_TAG}
     networks:
       - traefik
     deploy:

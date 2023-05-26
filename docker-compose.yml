@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   animomediator:
-    image: ghcr.io/animo/animo-mediator:main
+    image: ghcr.io/animo/animo-mediator:latest
     environment:
       AGENT_PORT: 3000
       AGENT_NAME: Mediator
