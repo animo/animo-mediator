@@ -23,7 +23,8 @@
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "yarn run build",
     "dev": "ts-node dev",
-    "start": "NODE_ENV=production node build/index.js"
+    "start": "NODE_ENV=production node build/index.js",
+    "validate": "yarn build && yarn check-format"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
