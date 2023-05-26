@@ -133,23 +133,6 @@ To deploy the mediator, a postgres database is required. Any postgres database w
 2. Run the docker image using the following command:
 
 ```sh
-docker run
-```
-
-### Building the Docker Image
-
-1. Build the docker image
-
-```
-docker build \
-   -t ghcr.io/animo/animo-mediator \
-   -f Dockerfile
-   .
-```
-
-2. Run the docker image using the following command:
-
-```sh
 docker run \
   -e "AGENT_ENDPOINTS=http://localhost:3000,ws://localhost:3000" \
   -e "WALLET_KEY=<your-wallet-key>" \
@@ -168,6 +151,17 @@ docker run \
 Make sure to use the correct tag. By default `latest` will be used which can have unexpected breakage. See the releases for the latest stable tag. Currently the last released tag is ![GitHub release (latest by date)](https://img.shields.io/github/v/release/animo/animo-mediator?display_name=tag&label=tag)
 
 You can also adapt the `docker-compose.yml` file to your needs.
+
+### Building the Docker Image
+
+You can build the docker image using the following command:
+
+```
+docker build \
+   -t ghcr.io/animo/animo-mediator \
+   -f Dockerfile
+   .
+```
 
 ## Roadmap
 
