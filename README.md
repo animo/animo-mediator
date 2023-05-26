@@ -22,6 +22,9 @@
   <a href="https://typescriptlang.org">
     <img src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg" />
   </a>
+  <a href="https://github.com/animo/animo-mediator/pkgs/container/animo-mediator">
+    <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/animo/animo-mediator?display_name=tag&label=docker%20tag">
+  </a>
 </p>
 
 <p align="center">
@@ -162,7 +165,9 @@ docker run \
   ghcr.io/animo/animo-mediator:latest
 ```
 
-You can also adapt the `docker-compose.yml` file to your needs. Make sure to use the correct tag. By default `latest` will be used which can have unexpected breakage. See the releases for the latest stable tag.
+Make sure to use the correct tag. By default `latest` will be used which can have unexpected breakage. See the releases for the latest stable tag. Currently the last released tag is ![GitHub release (latest by date)](https://img.shields.io/github/v/release/animo/animo-mediator?display_name=tag&label=tag)
+
+You can also adapt the `docker-compose.yml` file to your needs.
 
 ## Roadmap
 
