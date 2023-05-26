@@ -1,0 +1,29 @@
+name: Release Image
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build_and_deploy:
+    name: Build and Deploy Stack
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Publish Mediator
+        uses: ./.github/actions/publish-docker-image
+        with:
+          image-name: ghcr.io/animo/animo-mediator
+          context: .
+          docker-file: Dockerfile

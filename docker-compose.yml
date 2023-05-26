@@ -1,25 +1,12 @@
 version: '3.5'
 
 services:
-  animo-mediator:
+  animomediator:
     image: ghcr.io/animo/animo-mediator:main
-    networks:
-      - traefik
-    deploy:
-      labels:
-        # Enable traefik so the container can be exposed to the outside world
-        traefik.enable: 'true'
-
-        # HTTP and WS communication
-        traefik.http.routers.animo-mediator.rule: Host(`mediator.dev.animo.id`)
-        traefik.http.routers.animo-mediator.entrypoints: web-secure
-        traefik.http.routers.animo-mediator.tls.certresolver: zerossl
-        traefik.http.routers.animo-mediator.service: animo-mediator-service
-        traefik.http.services.animo-mediator-service.loadbalancer.server.port: 3000
     environment:
       AGENT_PORT: 3000
-      AGENT_NAME: Animo Mediator
-      WALLET_NAME: animo-mediator
+      AGENT_NAME: Mediator
+      WALLET_NAME: mediator
       WALLET_KEY: ${WALLET_KEY}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -27,13 +14,7 @@ services:
       POSTGRES_ADMIN_USER: ${POSTGRES_ADMIN_USER}
       POSTGRES_ADMIN_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
       POSTGRES_TLS_CA: ${POSTGRES_TLS_CA}
-      AGENT_ENDPOINTS: 'https://mediator.dev.animo.id,wss://mediator.dev.animo.id'
-      INVITATION_URL: https://mediator.dev.animo.id/invite
+      AGENT_ENDPOINTS: 'https://my-mediator.com,wss://my-mediator.com'
       LOG_LEVEL: 2
     ports:
       - '3000'
-
-networks:
-  traefik:
-    external: true
-    name: traefik

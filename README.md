@@ -56,6 +56,8 @@ Why should you use this mediator?
 
 ## Getting Started
 
+> If you want to deploy the mediator based on the pre-built docker image, please see the [Using Docker](#using-docker) section.
+
 Make sure you have followed the `libindy` setup form the AFJ docs: https://aries.js.org/guides/next/getting-started/set-up/indy-sdk
 
 Then run install to install dependencies:
@@ -99,10 +101,10 @@ The `POSTGRES_` variables won't be used in development mode (`NODE_ENV=developme
 | Variable                  | Description                                                                                                                                                                                                                                                                       |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AGENT_ENDPOINTS`         | Comma separated list of endpoints, in order of preference. In most cases you want to provide two endpoints, where the first one is an HTTP url, and the second one is an WebSocket url                                                                                            |
-| `AGENT_WALLET_KEY`        | The key to unlock the wallet.                                                                                                                                                                                                                                                     |
-| `AGENT_WALLET_NAME`       | The name of the wallet to use.                                                                                                                                                                                                                                                    |
 | `AGENT_NAME`              | The name of the agent. This will be used in invitations and will be publicly advertised.                                                                                                                                                                                          |
 | `AGENT_PORT`              | The port that is exposed for incoming traffic. Both the HTTP and WS inbound transport handlers are exposes on this port, and HTTP traffic will be upgraded to the WebSocket server when applicable.                                                                               |
+| `WALLET_NAME`             | The name of the wallet to use.                                                                                                                                                                                                                                                    |
+| `WALLET_KEY`              | The key to unlock the wallet.                                                                                                                                                                                                                                                     |
 | `INVITATION_URL`          | Optional URL that can be used as the base for the invitation url. This would allow you to render a certain web page that can extract the invitation form the `oob` parameter, and show the QR code, or show useful information to the end-user. Less applicable to mediator URLs. |
 | `POSTGRES_DATABASE_URL`   | The postgres database url.                                                                                                                                                                                                                                                        |
 | `POSTGRES_USER`           | The postgres user.                                                                                                                                                                                                                                                                |
@@ -122,6 +124,17 @@ To deploy the mediator, a postgres database is required. Any postgres database w
 
 ## Using Docker
 
+### Using the pre-built Docker Image
+
+1. Make sure you're [authenticated to the Github Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry)
+2. Run the docker image using the following command:
+
+```sh
+docker run
+```
+
+### Building the Docker Image
+
 1. Build the docker image
 
 ```
@@ -131,11 +144,25 @@ docker build \
    .
 ```
 
-1. Run the docker image
+2. Run the docker image using the following command:
 
+```sh
+docker run \
+  -e "AGENT_ENDPOINTS=http://localhost:3000,ws://localhost:3000" \
+  -e "WALLET_KEY=<your-wallet-key>" \
+  -e "WALLET_NAME=mediator" \
+  -e "AGENT_NAME=Mediator" \
+  -e "AGENT_PORT=3000" \
+  -e "POSTGRES_DATABASE_URL=postgres://postgres:postgres@localhost:5432/mediator" \
+  -e "POSTGRES_USER=postgres" \
+  -e "POSTGRES_PASSWORD=<your-postgres-password>" \
+  -e "POSTGRES_ADMIN_USER=postgres" \
+  -e "POSTGRES_ADMIN_PASSWORD=<your-postgres-password>" \
+  -p 3000:3000 \
+  ghcr.io/animo/animo-mediator:latest
 ```
-docker run ghcr.io/animo/animo-mediator
-```
+
+You can also adapt the `docker-compose.yml` file to your needs. Make sure to use the correct tag. By default `latest` will be used which can have unexpected breakage. See the releases for the latest stable tag.
 
 ## Roadmap
 
