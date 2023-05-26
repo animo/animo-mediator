@@ -6,8 +6,8 @@ on:
       - v*
 
 jobs:
-  build_and_deploy:
-    name: Build and Deploy Stack
+  release-image:
+    name: Release Image to Github Registry
     runs-on: ubuntu-20.04
 
     steps:
