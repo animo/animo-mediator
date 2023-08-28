@@ -23,13 +23,12 @@ jobs:
           WALLET_KEY: ${{ secrets.WALLET_KEY }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
           POSTGRES_ADMIN_USER: ${{ secrets.POSTGRES_ADMIN_USER }}
           POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
-          POSTGRES_TLS_CA: ${{ secrets.POSTGRES_TLS_CA }}
           IMAGE_TAG: ${{ inputs.tag }}
         with:
-          envs: WALLET_KEY,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DATABASE_URL,POSTGRES_ADMIN_USER,POSTGRES_ADMIN_PASSWORD,POSTGRES_TLS_CA,IMAGE_TAG
+          envs: WALLET_KEY,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_HOST,POSTGRES_ADMIN_USER,POSTGRES_ADMIN_PASSWORD,IMAGE_TAG
           stack-name: animo-afj-mediator
           stack-file: ./docker-compose-animo-mediator.yml
           private-key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
