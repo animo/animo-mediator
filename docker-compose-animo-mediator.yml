@@ -21,6 +21,7 @@ services:
       AGENT_NAME: Animo Mediator
       WALLET_NAME: animo-mediator
       WALLET_KEY: ${WALLET_KEY}
+      DID_WEB_SEED: ${DID_WEB_SEED}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: ${POSTGRES_HOST}

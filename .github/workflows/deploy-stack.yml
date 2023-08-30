@@ -21,6 +21,7 @@ jobs:
         uses: ./.github/actions/deploy
         env:
           WALLET_KEY: ${{ secrets.WALLET_KEY }}
+          DID_WEB_SEED: ${{ secrets.DID_WEB_SEED}}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
