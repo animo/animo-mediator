@@ -29,4 +29,5 @@ void createAgent().then(async (agent) => {
   })
 
   agent.config.logger.info(`Out of band invitation url: \n\n\t${mediatorInvitationUrlLong}`)
+  agent.config.logger.info(`Did Web Url '${httpEndpoint}/.well-known/did.json'`)
 })

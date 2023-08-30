@@ -8,6 +8,7 @@ export const AGENT_ENDPOINTS = process.env.AGENT_ENDPOINTS?.split(',') ?? [
   `http://localhost:${AGENT_PORT}`,
   `ws://localhost:${AGENT_PORT}`,
 ]
+export const DID_WEB_SEED = process.env.DID_WEB_SEED || 'qxerQNrTbyrrNQeAhwhJuOLfYIvTSRyG'
 
 export const POSTGRES_HOST = process.env.POSTGRES_HOST
 export const POSTGRES_USER = process.env.POSTGRES_USER
