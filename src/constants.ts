@@ -3,7 +3,7 @@ import { LogLevel } from '@aries-framework/core'
 export const AGENT_PORT = process.env.AGENT_PORT ? Number(process.env.AGENT_PORT) : 3000
 export const AGENT_NAME = process.env.AGENT_NAME || 'Animo Mediator'
 export const WALLET_NAME = process.env.WALLET_NAME || 'animo-mediator-dev'
-export const WALLET_KEY = process.env.WALLET_KEY || 'animo-mediator-dev'
+export const WALLET_KEY = process.env.WALLET_KEY || 'EAyhwhZJmdzHenyDnDCFBfFxPyc9F4zXsTwzWueHHjgH'
 export const AGENT_ENDPOINTS = process.env.AGENT_ENDPOINTS?.split(',') ?? [
   `http://localhost:${AGENT_PORT}`,
   `ws://localhost:${AGENT_PORT}`,

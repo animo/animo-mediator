@@ -60,6 +60,7 @@ export async function createAgent() {
     id: WALLET_NAME,
     key: WALLET_KEY,
     storage: storageConfig,
+    keyDerivationMethod: KeyDerivationMethod.Raw,
   }
 
   if (storageConfig) {
@@ -134,4 +135,4 @@ export async function createAgent() {
   return agent
 }
 
-export type MediatorAgent = ReturnType<typeof createAgent>
+export type MediatorAgent = Awaited<ReturnType<typeof createAgent>>
