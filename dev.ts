@@ -15,8 +15,6 @@ void connect(port).then((url) => {
 
   process.env.NODE_ENV = 'development'
   process.env.AGENT_PORT = `${port}`
-  process.env.AGENT_ENDPOINTS = `${url},${url.replace('http', 'ws')}`
-  process.env.SHORTENER_BASE_URL = `${url}/s`
-
+  process.env.AGENT_ENDPOINT = url
   require('./src/index')
 })

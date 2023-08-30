@@ -1,19 +1,14 @@
 import { LogLevel } from '@aries-framework/core'
 
 export const AGENT_PORT = process.env.AGENT_PORT ? Number(process.env.AGENT_PORT) : 3000
-export const AGENT_NAME = process.env.AGENT_NAME || 'Animo Mediator'
-export const WALLET_NAME = process.env.WALLET_NAME || 'animo-mediator-dev'
-export const WALLET_KEY = process.env.WALLET_KEY || 'animo-mediator-dev'
-export const AGENT_ENDPOINTS = process.env.AGENT_ENDPOINTS?.split(',') ?? [
-  `http://localhost:${AGENT_PORT}`,
-  `ws://localhost:${AGENT_PORT}`,
-]
+export const AGENT_ENDPOINT = process.env.AGENT_ENDPOINT || `http://localhost:${AGENT_PORT}`
+export const WALLET_ID = process.env.WALLET_ID || 'animo-mediator-dev'
+export const WALLET_KEY = process.env.WALLET_KEY || 'EAyhwhZJmdzHenyDnDCFBfFxPyc9F4zXsTwzWueHHjgH'
+export const AGENT_LABEL = process.env.AGENT_LABEL || 'Animo Mediator'
 
 export const POSTGRES_HOST = process.env.POSTGRES_HOST
 export const POSTGRES_USER = process.env.POSTGRES_USER
 export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD
-export const POSTGRES_ADMIN_USER = process.env.POSTGRES_ADMIN_USER
-export const POSTGRES_ADMIN_PASSWORD = process.env.POSTGRES_ADMIN_PASSWORD
 
 export const INVITATION_URL = process.env.INVITATION_URL
 
