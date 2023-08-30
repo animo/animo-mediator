@@ -99,26 +99,24 @@ You can provide a number of environment variables to run the agent. The followin
 
 The `POSTGRES_` variables won't be used in development mode (`NODE_ENV=development`), but are required when `NODE_ENV` is `production`. This makes local development easier, but makes sure you have a persistent database when deploying.
 
-| Variable                  | Description                                                                                                                                                                                                                                                                       |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AGENT_ENDPOINTS`         | Comma separated list of endpoints, in order of preference. In most cases you want to provide two endpoints, where the first one is an HTTP url, and the second one is an WebSocket url                                                                                            |
-| `AGENT_NAME`              | The name of the agent. This will be used in invitations and will be publicly advertised.                                                                                                                                                                                          |
-| `AGENT_PORT`              | The port that is exposed for incoming traffic. Both the HTTP and WS inbound transport handlers are exposes on this port, and HTTP traffic will be upgraded to the WebSocket server when applicable.                                                                               |
-| `WALLET_NAME`             | The name of the wallet to use.                                                                                                                                                                                                                                                    |
-| `WALLET_KEY`              | The raw wallet key to unlock the wallet.                                                                                                                                                                                                                                          |
-| `INVITATION_URL`          | Optional URL that can be used as the base for the invitation url. This would allow you to render a certain web page that can extract the invitation form the `oob` parameter, and show the QR code, or show useful information to the end-user. Less applicable to mediator URLs. |
-| `POSTGRES_HOST`           | Host of the database to use. Should include both host and port.                                                                                                                                                                                                                   |
-| `POSTGRES_USER`           | The postgres user.                                                                                                                                                                                                                                                                |
-| `POSTGRES_PASSWORD`       | The postgres password.                                                                                                                                                                                                                                                            |
-| `POSTGRES_ADMIN_USER`     | The postgres admin user.                                                                                                                                                                                                                                                          |
-| `POSTGRES_ADMIN_PASSWORD` | The postgres admin password.                                                                                                                                                                                                                                                      |
+| Variable            | Description                                                                                                                                                                                                                                                                       |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AGENT_ENDPOINT`    | The HTTP endpoint of the agent. Since it is also recommended to support WebSocket transports for mediators, the corresponding endpoint will be created automatically.                                                                                                             |
+| `AGENT_LABEL`       | The name of the agent. This will be used in invitations and will be publicly advertised.                                                                                                                                                                                          |
+| `AGENT_PORT`        | The port that is exposed for incoming traffic. Both the HTTP and WS inbound transport handlers are exposes on this port, and HTTP traffic will be upgraded to the WebSocket server when applicable.                                                                               |
+| `WALLET_ID`         | The name of the wallet to use.                                                                                                                                                                                                                                                    |
+| `WALLET_KEY`        | The raw wallet key to unlock the wallet.                                                                                                                                                                                                                                          |
+| `INVITATION_URL`    | Optional URL that can be used as the base for the invitation url. This would allow you to render a certain web page that can extract the invitation form the `oob` parameter, and show the QR code, or show useful information to the end-user. Less applicable to mediator URLs. |
+| `POSTGRES_HOST`     | Host of the database to use. Should include both host and port.                                                                                                                                                                                                                   |
+| `POSTGRES_USER`     | The postgres user.                                                                                                                                                                                                                                                                |
+| `POSTGRES_PASSWORD` | The postgres password.                                                                                                                                                                                                                                                            |
 
 ## Postgres Database
 
 To deploy the mediator, a postgres database is required. Any postgres database will do. The mediator deployed to `https://mediator.dev.animo.id` is deployed to a DigitalOcean managed postgres database.
 
 1. Create a postgres database and make sure it is publicly exposed.
-2. Set the `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_ADMIN_USER`, `POSTGRES_ADMIN_PASSWORD` variables. For the mediator we use the same username and password for the admin user and the regular user, but you might want to create a separate user for the admin user.
+2. Set the `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, variables. For the mediator we use the same username and password for the admin user and the regular user, but you might want to create a separate user for the admin user.
 
 ## Using Docker
 
@@ -129,16 +127,14 @@ To deploy the mediator, a postgres database is required. Any postgres database w
 
 ```sh
 docker run \
-  -e "AGENT_ENDPOINTS=http://localhost:3000,ws://localhost:3000" \
+  -e "AGENT_ENDPOINT=http://localhost:3000" \
   -e "WALLET_KEY=<your-wallet-key>" \
-  -e "WALLET_NAME=mediator" \
-  -e "AGENT_NAME=Mediator" \
+  -e "WALLET_ID=mediator" \
+  -e "AGENT_LABEL=Mediator" \
   -e "AGENT_PORT=3000" \
   -e "POSTGRES_HOST=mediator-database-xxxx.ondigitalocean.com:25060" \
   -e "POSTGRES_USER=postgres" \
   -e "POSTGRES_PASSWORD=<your-postgres-password>" \
-  -e "POSTGRES_ADMIN_USER=postgres" \
-  -e "POSTGRES_ADMIN_PASSWORD=<your-postgres-password>" \
   -p 3000:3000 \
   ghcr.io/animo/animo-mediator:latest
 ```

@@ -6,6 +6,7 @@ import {
   DidCommMimeType,
   HttpOutboundTransport,
   InMemoryLruCache,
+  KeyDerivationMethod,
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
@@ -19,7 +20,7 @@ import type { Socket } from 'net'
 import express from 'express'
 import { Server } from 'ws'
 
-import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
+import { AGENT_ENDPOINT, AGENT_LABEL, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_ID, WALLET_KEY } from './constants'
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
@@ -57,7 +58,7 @@ export async function createAgent() {
   const storageConfig = POSTGRES_HOST ? askarPostgresConfig : undefined
 
   const walletConfig: WalletConfig = {
-    id: WALLET_NAME,
+    id: WALLET_ID,
     key: WALLET_KEY,
     storage: storageConfig,
     keyDerivationMethod: KeyDerivationMethod.Raw,
@@ -74,10 +75,14 @@ export async function createAgent() {
     })
   }
 
+  const domain = AGENT_ENDPOINT.split(/https?:\/\//i)[1]
+  const httpEndpoint = AGENT_ENDPOINT
+  const wsEndpoint = `ws://${domain}`
+
   const agent = new Agent({
     config: {
-      label: AGENT_NAME,
-      endpoints: AGENT_ENDPOINTS,
+      label: AGENT_LABEL,
+      endpoints: [httpEndpoint, wsEndpoint],
       walletConfig: walletConfig,
       useDidSovPrefixWhereAllowed: true,
       logger: logger,
