@@ -61,9 +61,7 @@ Why should you use this mediator?
 
 > If you want to deploy the mediator based on the pre-built docker image, please see the [Using Docker](#using-docker) section.
 
-Make sure you have followed the `libindy` setup form the AFJ docs: https://aries.js.org/guides/next/getting-started/set-up/indy-sdk
-
-Then run install to install dependencies:
+Install dependencies:
 
 ```bash
 yarn install
@@ -99,7 +97,7 @@ If you're using an Aries Framework JavaScript agent as the client, you can follo
 
 You can provide a number of environment variables to run the agent. The following table lists the environment variables that can be used.
 
-The `POSTGRES_` variables won't be used in development mode (`NODE_ENV=development`), but are required when `NODE_ENV` is not `development`. This makes local development easier, but makes sure you have a persistent database when deploying.
+The `POSTGRES_` variables won't be used in development mode (`NODE_ENV=development`), but are required when `NODE_ENV` is `production`. This makes local development easier, but makes sure you have a persistent database when deploying.
 
 | Variable                  | Description                                                                                                                                                                                                                                                                       |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -109,21 +107,18 @@ The `POSTGRES_` variables won't be used in development mode (`NODE_ENV=developme
 | `WALLET_NAME`             | The name of the wallet to use.                                                                                                                                                                                                                                                    |
 | `WALLET_KEY`              | The key to unlock the wallet.                                                                                                                                                                                                                                                     |
 | `INVITATION_URL`          | Optional URL that can be used as the base for the invitation url. This would allow you to render a certain web page that can extract the invitation form the `oob` parameter, and show the QR code, or show useful information to the end-user. Less applicable to mediator URLs. |
-| `POSTGRES_DATABASE_URL`   | The postgres database url. Should be host:port (e.g. `10.10.10.10:3600`)                                                                                                                                                                                                          |
+| `POSTGRES_HOST`           | Host of the database to use. Should include both host and port.                                                                                                                                                                                                                   |
 | `POSTGRES_USER`           | The postgres user.                                                                                                                                                                                                                                                                |
 | `POSTGRES_PASSWORD`       | The postgres password.                                                                                                                                                                                                                                                            |
 | `POSTGRES_ADMIN_USER`     | The postgres admin user.                                                                                                                                                                                                                                                          |
 | `POSTGRES_ADMIN_PASSWORD` | The postgres admin password.                                                                                                                                                                                                                                                      |
-| `POSTGRES_TLS_CA_FILE`    | Path to a file containing a TLS CA. Will have precedence over `POSTGRES_TLS_CA` if both are provided                                                                                                                                                                              |
-| `POSTGRES_TLS_CA`         | Value of the TLS CA. Will have no effect if `POSTGRES_TLS_CA` is used as well.                                                                                                                                                                                                    |
 
 ## Postgres Database
 
 To deploy the mediator, a postgres database is required. Any postgres database will do. The mediator deployed to `https://mediator.dev.animo.id` is deployed to a DigitalOcean managed postgres database.
 
 1. Create a postgres database and make sure it is publicly exposed.
-2. Set the `POSTGRES_DATABASE_URL`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_ADMIN_USER`, `POSTGRES_ADMIN_PASSWORD` variables. For the mediator we use the same username and password for the admin user and the regular user, but you might want to create a separate user for the admin user.
-3. If you want to set up TLS (or your database requires it, like is the case with DigitalOcean), download the tls CA file, and set either the `POSTGRES_TLS_CA_FILE` or `POSTGRES_TLS_CA` variable. The `POSTGRES_TLS_CA` variable should contain the contents of the CA file, which can be an easier way to set it up in when using docker and having the contents of the CA file in a secret.
+2. Set the `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_ADMIN_USER`, `POSTGRES_ADMIN_PASSWORD` variables. For the mediator we use the same username and password for the admin user and the regular user, but you might want to create a separate user for the admin user.
 
 ## Using Docker
 
@@ -139,7 +134,7 @@ docker run \
   -e "WALLET_NAME=mediator" \
   -e "AGENT_NAME=Mediator" \
   -e "AGENT_PORT=3000" \
-  -e "POSTGRES_DATABASE_URL=postgres://postgres:postgres@localhost:5432/mediator" \
+  -e "POSTGRES_HOST=mediator-database-xxxx.ondigitalocean.com:25060" \
   -e "POSTGRES_USER=postgres" \
   -e "POSTGRES_PASSWORD=<your-postgres-password>" \
   -e "POSTGRES_ADMIN_USER=postgres" \
@@ -159,7 +154,7 @@ You can build the docker image using the following command:
 ```
 docker build \
    -t ghcr.io/animo/animo-mediator \
-   -f Dockerfile
+   -f Dockerfile \
    .
 ```
 
@@ -167,9 +162,8 @@ docker build \
 
 The contents in this repository started out as a simple mediator built using Aries Framework JavaScript that can be used for development. Over time we've added some features, but there's still a lot we want to add to this repository over time. Some things on the roadmap:
 
-- Replace the Indy SDK with Aries Askar
 - Expose a `did:web` did, so you can directly connect to the mediator using only a did
-- Allow for customizing the message queue implementation, so it doesn't have to be stored in the Indy SDK / Askar database, but rather in high-volume message queue like Kafka.
+- Allow for customizing the message queue implementation, so it doesn't have to be stored in the Askar database, but rather in high-volume message queue like Kafka.
 - DIDComm v2 support
 - Sending push notifications to the recipient when a message is queued for them
 - Allow to control acceptance of mediation requests

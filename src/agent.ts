@@ -1,47 +1,48 @@
-import { InitConfig, OutOfBandRole, OutOfBandState } from '@aries-framework/core'
-import type { Socket } from 'net'
-import { HttpOutboundTransport, Agent, WsOutboundTransport } from '@aries-framework/core'
-
+import { AskarModule, AskarMultiWalletDatabaseScheme } from '@aries-framework/askar'
 import {
-  HttpInboundTransport,
-  agentDependencies,
-  WsInboundTransport,
-  IndySdkPostgresWalletScheme,
-  loadIndySdkPostgresPlugin,
-  IndySdkPostgresStorageConfig,
-} from '@aries-framework/node'
-
-import indySdk, { setDefaultLogger } from 'indy-sdk'
+  Agent,
+  CacheModule,
+  ConnectionsModule,
+  DidCommMimeType,
+  HttpOutboundTransport,
+  InMemoryLruCache,
+  MediatorModule,
+  OutOfBandRole,
+  OutOfBandState,
+  WalletConfig,
+  WsOutboundTransport,
+} from '@aries-framework/core'
+import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@aries-framework/node'
+import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
+import type { Socket } from 'net'
 
 import express from 'express'
-import { writeFileSync } from 'fs'
-import { tmpdir } from 'os'
-import path from 'path'
 import { Server } from 'ws'
 
-import {
-  AGENT_ENDPOINTS,
-  AGENT_NAME,
-  AGENT_PORT,
-  DEBUG_INDY,
-  IS_DEV,
-  LOG_LEVEL,
-  POSTGRES_ADMIN_PASSWORD,
-  POSTGRES_ADMIN_USER,
-  POSTGRES_DATABASE_URL,
-  POSTGRES_PASSWORD,
-  POSTGRES_TLS_CA,
-  POSTGRES_TLS_CA_FILE,
-  POSTGRES_USER,
-  WALLET_KEY,
-  WALLET_NAME,
-} from './constants'
+import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
+import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
-import { IndySdkModule } from '@aries-framework/indy-sdk'
 
-if (DEBUG_INDY) {
-  setDefaultLogger('trace')
+function createModules() {
+  const modules = {
+    StorageModule: new StorageMessageQueueModule(),
+    cache: new CacheModule({
+      cache: new InMemoryLruCache({ limit: 500 }),
+    }),
+    connections: new ConnectionsModule({
+      autoAcceptConnections: true,
+    }),
+    mediator: new MediatorModule({
+      autoAcceptMediationRequests: true,
+    }),
+    askar: new AskarModule({
+      ariesAskar,
+      multiWalletDatabaseScheme: AskarMultiWalletDatabaseScheme.ProfilePerWallet,
+    }),
+  }
+
+  return modules
 }
 
 export async function createAgent() {
@@ -53,43 +54,45 @@ export async function createAgent() {
   const logger = new Logger(LOG_LEVEL)
 
   // Only load postgres database in production
-  const storageConfig = IS_DEV ? undefined : loadPostgres()
+  const storageConfig = POSTGRES_HOST ? askarPostgresConfig : undefined
+
+  const walletConfig: WalletConfig = {
+    id: WALLET_NAME,
+    key: WALLET_KEY,
+    storage: storageConfig,
+  }
 
   if (storageConfig) {
-    logger.info('Using postgres storage')
+    logger.info('Using postgres storage', {
+      walletId: walletConfig.id,
+      host: storageConfig.config.host,
+    })
+  } else {
+    logger.info('Using SQlite storage', {
+      walletId: walletConfig.id,
+    })
   }
 
-  const agentConfig: InitConfig = {
-    endpoints: AGENT_ENDPOINTS,
-    label: AGENT_NAME,
-    walletConfig: {
-      id: WALLET_NAME,
-      key: WALLET_KEY,
-      storage: storageConfig,
-    },
-    autoAcceptConnections: true,
-    autoAcceptMediationRequests: true,
-    autoUpdateStorageOnStartup: true,
-    logger,
-  }
-
-  // Set up agent
   const agent = new Agent({
-    config: agentConfig,
+    config: {
+      label: AGENT_NAME,
+      endpoints: AGENT_ENDPOINTS,
+      walletConfig: walletConfig,
+      useDidSovPrefixWhereAllowed: true,
+      logger: logger,
+      // FIXME: We should probably remove this at some point, but it will require custom logic
+      // Also, doesn't work with multi-tenancy yet
+      autoUpdateStorageOnStartup: true,
+      didCommMimeType: DidCommMimeType.V0,
+    },
     dependencies: agentDependencies,
     modules: {
-      StorageModule: new StorageMessageQueueModule(),
-      indySdk: new IndySdkModule({
-        indySdk,
-      }),
+      ...createModules(),
     },
   })
 
   // Create all transports
-  const httpInboundTransport = new HttpInboundTransport({
-    app,
-    port: AGENT_PORT,
-  })
+  const httpInboundTransport = new HttpInboundTransport({ app, port: AGENT_PORT })
   const httpOutboundTransport = new HttpOutboundTransport()
   const wsInboundTransport = new WsInboundTransport({ server: socketServer })
   const wsOutboundTransport = new WsOutboundTransport()
@@ -131,47 +134,4 @@ export async function createAgent() {
   return agent
 }
 
-function loadPostgres() {
-  if (
-    !POSTGRES_DATABASE_URL ||
-    !POSTGRES_USER ||
-    !POSTGRES_PASSWORD ||
-    !POSTGRES_ADMIN_USER ||
-    !POSTGRES_ADMIN_PASSWORD
-  ) {
-    throw new Error('Missing required postgres environment variables')
-  }
-
-  let postgresTlsFile = POSTGRES_TLS_CA_FILE
-  if (!postgresTlsFile && POSTGRES_TLS_CA) {
-    postgresTlsFile = path.join(tmpdir(), 'postgres-tls.crt')
-    writeFileSync(postgresTlsFile, POSTGRES_TLS_CA)
-  }
-
-  const storageConfig = {
-    type: 'postgres_storage',
-    config: {
-      url: POSTGRES_DATABASE_URL,
-      wallet_scheme: IndySdkPostgresWalletScheme.DatabasePerWallet,
-    },
-    credentials: {
-      account: POSTGRES_USER,
-      password: POSTGRES_PASSWORD,
-      admin_account: POSTGRES_ADMIN_USER,
-      admin_password: POSTGRES_ADMIN_PASSWORD,
-    },
-  }
-
-  if (postgresTlsFile) {
-    storageConfig.config = {
-      ...storageConfig.config,
-      // @ts-ignore
-      tls_ca: postgresTlsFile,
-      tls: 'Require',
-    }
-  }
-
-  loadIndySdkPostgresPlugin(storageConfig.config, storageConfig.credentials)
-
-  return storageConfig
-}
+export type MediatorAgent = ReturnType<typeof createAgent>
