@@ -66,6 +66,7 @@ function createModules() {
 
 async function createAndImportDid(agent: MediatorAgent) {
   const httpEndpoint = agent.config.endpoints.find((e) => e.startsWith('http')) as string
+  const wsEndpoint = agent.config.endpoints.find((e) => e.startsWith('ws')) as string
   const domain = httpEndpoint.replace(/^https?:\/\//, '')
   const did = `did:web:${domain}`
 
@@ -98,7 +99,7 @@ async function createAndImportDid(agent: MediatorAgent) {
     service: [
       new DidCommV1Service({
         id: `did:web:${domain}#animo-mediator`,
-        serviceEndpoint: httpEndpoint,
+        serviceEndpoint: wsEndpoint,
         recipientKeys: [verificationMethod.id],
       }),
     ],
@@ -156,9 +157,7 @@ export async function createAgent() {
       didCommMimeType: DidCommMimeType.V0,
     },
     dependencies: agentDependencies,
-    modules: {
-      ...createModules(),
-    },
+    modules: createModules(),
   })
 
   // Create all transports
