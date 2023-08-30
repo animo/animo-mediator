@@ -1,0 +1,35 @@
+name: Publish Docker Images to Google Cloud Artifact Registry
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-mediator-image:
+    runs-on: ubuntu-20.04
+    name: Publish Mediator Image
+
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      packages: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up and authenticate gcloud
+        uses: ./.github/actions/setup-gcloud
+
+      - name: Log in to the Container registry
+        run: gcloud auth configure-docker europe-docker.pkg.dev
+
+      - name: Build and push Agent Server Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: ./apps/mediator/Dockerfile
+          push: true
+          tags: europe-docker.pkg.dev/animo-saas/paradym/mediator:${{ github.run_id }}
