@@ -10,6 +10,7 @@ import {
   PushNotificationsFcmSetDeviceInfoHandler,
 } from './handlers'
 import { PushNotificationsFcmRole } from './models'
+import { PushNotificationsFcmRepository } from './repository'
 
 /**
  * Module that exposes push notification get and set functionality
@@ -18,9 +19,14 @@ export class PushNotificationsFcmModule implements Module {
   public readonly api = PushNotificationsFcmApi
 
   public register(dependencyManager: DependencyManager, featureRegistry: FeatureRegistry): void {
+    // Api
     dependencyManager.registerContextScoped(PushNotificationsFcmApi)
 
+    // Services
     dependencyManager.registerSingleton(PushNotificationsFcmService)
+
+    // Repository
+    dependencyManager.registerSingleton(PushNotificationsFcmRepository)
 
     featureRegistry.register(
       new Protocol({
@@ -28,11 +34,5 @@ export class PushNotificationsFcmModule implements Module {
         roles: [PushNotificationsFcmRole.Sender, PushNotificationsFcmRole.Receiver],
       })
     )
-
-    dependencyManager.registerMessageHandlers([
-      new PushNotificationsFcmDeviceInfoHandler(),
-      new PushNotificationsFcmSetDeviceInfoHandler(),
-      new PushNotificationsFcmProblemReportHandler(),
-    ])
   }
 }

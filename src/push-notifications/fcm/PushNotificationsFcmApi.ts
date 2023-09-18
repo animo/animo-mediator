@@ -9,6 +9,11 @@ import {
 } from '@aries-framework/core'
 
 import { PushNotificationsFcmService } from './services/PushNotificationsFcmService'
+import {
+  PushNotificationsFcmDeviceInfoHandler,
+  PushNotificationsFcmProblemReportHandler,
+  PushNotificationsFcmSetDeviceInfoHandler,
+} from './handlers'
 
 @injectable()
 export class PushNotificationsFcmApi {
@@ -27,6 +32,12 @@ export class PushNotificationsFcmApi {
     this.pushNotificationsService = pushNotificationsService
     this.connectionService = connectionService
     this.agentContext = agentContext
+
+    this.agentContext.dependencyManager.registerMessageHandlers([
+      new PushNotificationsFcmSetDeviceInfoHandler(this.pushNotificationsService),
+      new PushNotificationsFcmDeviceInfoHandler(),
+      new PushNotificationsFcmProblemReportHandler(this.pushNotificationsService),
+    ])
   }
 
   /**

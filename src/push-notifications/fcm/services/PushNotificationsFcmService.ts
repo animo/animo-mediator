@@ -52,15 +52,28 @@ export class PushNotificationsFcmService {
     })
   }
 
-  public processSetDeviceInfo(messageContext: InboundMessageContext<PushNotificationsFcmSetDeviceInfoMessage>) {
+  public async processSetDeviceInfo(messageContext: InboundMessageContext<PushNotificationsFcmSetDeviceInfoMessage>) {
     const { message } = messageContext
     if (
       (message.deviceToken === null && message.devicePlatform !== null) ||
       (message.deviceToken !== null && message.devicePlatform === null)
-    )
+    ) {
       throw new PushNotificationsFcmProblemReportError('Both or none of deviceToken and devicePlatform must be null', {
         problemCode: PushNotificationsFcmProblemReportReason.MissingValue,
       })
+    }
+
+    const connection = messageContext.assertReadyConnection()
+
+    const pushNotificationsFcmRecord = new PushNotificationsFcmRecord({
+      connectionId: connection.id,
+      deviceToken: message.deviceToken,
+      devicePlatform: message.devicePlatform,
+    })
+
+    await this.pushNotificationsFcmRepository.save(messageContext.agentContext, pushNotificationsFcmRecord)
+
+    return pushNotificationsFcmRecord
   }
 
   public async sendNotification(agentContext: AgentContext, connectionId: string) {

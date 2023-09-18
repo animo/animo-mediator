@@ -23,6 +23,7 @@ import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALL
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
+import { PushNotificationsFcmModule } from './push-notifications/fcm'
 
 function createModules() {
   const modules = {
@@ -40,6 +41,7 @@ function createModules() {
       ariesAskar,
       multiWalletDatabaseScheme: AskarMultiWalletDatabaseScheme.ProfilePerWallet,
     }),
+    pushNotificationsFcm: new PushNotificationsFcmModule(),
   }
 
   return modules

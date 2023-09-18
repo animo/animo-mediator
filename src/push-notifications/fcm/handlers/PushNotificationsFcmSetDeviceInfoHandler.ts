@@ -7,7 +7,12 @@ import { PushNotificationsFcmSetDeviceInfoMessage } from '../messages'
  * Handler for incoming push notification device info messages
  */
 export class PushNotificationsFcmSetDeviceInfoHandler implements MessageHandler {
+  private pushNotificationsFcmService: PushNotificationsFcmService
   public supportedMessages = [PushNotificationsFcmSetDeviceInfoMessage]
+
+  public constructor(pushNotificationsFcmService: PushNotificationsFcmService) {
+    this.pushNotificationsFcmService = pushNotificationsFcmService
+  }
 
   /**
   /* Only perform checks about message fields
@@ -15,10 +20,6 @@ export class PushNotificationsFcmSetDeviceInfoHandler implements MessageHandler 
   /* The result can be hooked into through the generic message processed event
    */
   public async handle(inboundMessage: MessageHandlerInboundMessage<PushNotificationsFcmSetDeviceInfoHandler>) {
-    inboundMessage.assertReadyConnection()
-
-    const pushNotificationsFcmService =
-      inboundMessage.agentContext.dependencyManager.resolve(PushNotificationsFcmService)
-    pushNotificationsFcmService.processSetDeviceInfo(inboundMessage)
+    await this.pushNotificationsFcmService.processSetDeviceInfo(inboundMessage)
   }
 }
