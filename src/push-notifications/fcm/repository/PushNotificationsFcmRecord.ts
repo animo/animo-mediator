@@ -3,8 +3,6 @@ import type { TagsBase } from '@aries-framework/core'
 import { utils, BaseRecord } from '@aries-framework/core'
 
 export type DefaultPushNotificationsFcmTags = {
-  deviceToken: string | null
-  devicePlatform: string | null
   connectionId: string
 }
 
@@ -36,6 +34,7 @@ export class PushNotificationsFcmRecord extends BaseRecord<
       this.id = props.id ?? utils.uuid()
       this.devicePlatform = props.devicePlatform
       this.deviceToken = props.deviceToken
+      this.connectionId = props.connectionId
       this._tags = props.tags ?? {}
     }
   }
@@ -43,8 +42,6 @@ export class PushNotificationsFcmRecord extends BaseRecord<
   public getTags() {
     return {
       ...this._tags,
-      deviceToken: this.deviceToken,
-      devicePlatform: this.devicePlatform,
       connectionId: this.connectionId,
     }
   }

@@ -15,12 +15,19 @@ export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD
 export const POSTGRES_ADMIN_USER = process.env.POSTGRES_ADMIN_USER
 export const POSTGRES_ADMIN_PASSWORD = process.env.POSTGRES_ADMIN_PASSWORD
 
-export const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID
-export const FIREBASE_NOTIFICATION_TITLE = process.env.FIREBASE_NOTIFICATION_TITLE
-export const FIREBASE_NOTIFICATION_BODY = process.env.FIREBASE_NOTIFICATION_BODY
-
 export const INVITATION_URL = process.env.INVITATION_URL
 
 export const LOG_LEVEL = LogLevel.debug
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
+
+export const USE_PUSH_NOTIFICATIONS = process.env.USE_PUSH_NOTIFICATIONS === 'true'
+
+export const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID
+export const FIREBASE_PRIVATE_KEY = process.env.FIREBASE_PRIVATE_KEY
+  ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+  : undefined
+export const FIREBASE_CLIENT_EMAIL = process.env.FIREBASE_CLIENT_EMAIL
+
+export const FIREBASE_NOTIFICATION_TITLE = process.env.FIREBASE_NOTIFICATION_TITLE
+export const FIREBASE_NOTIFICATION_BODY = process.env.FIREBASE_NOTIFICATION_BODY

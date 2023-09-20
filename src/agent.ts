@@ -19,11 +19,26 @@ import type { Socket } from 'net'
 import express from 'express'
 import { Server } from 'ws'
 
-import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
+import {
+  AGENT_ENDPOINTS,
+  AGENT_NAME,
+  AGENT_PORT,
+  FIREBASE_CLIENT_EMAIL,
+  FIREBASE_PRIVATE_KEY,
+  FIREBASE_PROJECT_ID,
+  LOG_LEVEL,
+  POSTGRES_HOST,
+  USE_PUSH_NOTIFICATIONS,
+  WALLET_KEY,
+  WALLET_NAME,
+} from './constants'
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
+import { routingEvents } from './events/RoutingEvents'
+import { initializeApp } from 'firebase-admin/app'
+import { credential } from 'firebase-admin'
 
 function createModules() {
   const modules = {
@@ -125,6 +140,18 @@ export async function createAgent() {
 
   await agent.initialize()
 
+  // Register all event handlers and initialize fcm module
+  if (USE_PUSH_NOTIFICATIONS) {
+    initializeApp({
+      credential: credential.cert({
+        projectId: FIREBASE_PROJECT_ID,
+        clientEmail: FIREBASE_CLIENT_EMAIL,
+        privateKey: FIREBASE_PRIVATE_KEY,
+      }),
+    })
+    routingEvents(agent)
+  }
+
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server
   httpInboundTransport.server?.on('upgrade', (request, socket, head) => {
@@ -136,4 +163,4 @@ export async function createAgent() {
   return agent
 }
 
-export type MediatorAgent = ReturnType<typeof createAgent>
+export type MediatorAgent = Agent<ReturnType<typeof createModules>>

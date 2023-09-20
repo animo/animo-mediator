@@ -4,11 +4,6 @@ import { Protocol } from '@aries-framework/core'
 
 import { PushNotificationsFcmApi } from './PushNotificationsFcmApi'
 import { PushNotificationsFcmService } from './services/PushNotificationsFcmService'
-import {
-  PushNotificationsFcmDeviceInfoHandler,
-  PushNotificationsFcmProblemReportHandler,
-  PushNotificationsFcmSetDeviceInfoHandler,
-} from './handlers'
 import { PushNotificationsFcmRole } from './models'
 import { PushNotificationsFcmRepository } from './repository'
 

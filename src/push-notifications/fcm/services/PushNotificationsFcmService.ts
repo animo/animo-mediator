@@ -7,9 +7,6 @@ import { Lifecycle, scoped } from 'tsyringe'
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
 import { PushNotificationsFcmSetDeviceInfoMessage, PushNotificationsFcmDeviceInfoMessage } from '../messages'
 import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../repository'
-import fetch from 'node-fetch'
-import { BASE_URL, ENDPOINT_PREFIX, ENDPOINT_SUFFIX } from '../constants'
-import { FIREBASE_NOTIFICATION_BODY, FIREBASE_NOTIFICATION_TITLE, FIREBASE_PROJECT_ID } from 'src/constants'
 
 @scoped(Lifecycle.ContainerScoped)
 export class PushNotificationsFcmService {
@@ -76,44 +73,15 @@ export class PushNotificationsFcmService {
     return pushNotificationsFcmRecord
   }
 
-  public async sendNotification(agentContext: AgentContext, connectionId: string) {
-    const record = await this.pushNotificationsFcmRepository.getById(agentContext, connectionId)
+  public async getDeviceInfo(agentContext: AgentContext, connectionId: string) {
+    const pushNotificationsFcmRecord = await this.pushNotificationsFcmRepository.getSingleByQuery(agentContext, {
+      connectionId,
+    })
 
-    if (!record.deviceToken) {
-      return
+    if (!pushNotificationsFcmRecord) {
+      console.error(`No device info found for connection ${connectionId}`)
     }
 
-    const response = await this.sendFcmNotification(record.deviceToken)
-    console.log('first response', response)
-  }
-
-  private async sendFcmNotification(deviceToken: string) {
-    const headers = {
-      Authorization: 'Bearer ',
-      'Content-Type': 'application/json; UTF-8',
-    }
-
-    const PROJECT_ID = FIREBASE_PROJECT_ID
-    const FCM_ENDPOINT = ENDPOINT_PREFIX + PROJECT_ID + ENDPOINT_SUFFIX
-    const FCM_URL = BASE_URL + '/' + FCM_ENDPOINT
-
-    const body = {
-      message: {
-        token: deviceToken,
-        notification: {
-          title: FIREBASE_NOTIFICATION_TITLE,
-          body: FIREBASE_NOTIFICATION_BODY,
-        },
-      },
-    }
-    try {
-      return fetch(FCM_URL, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers,
-      })
-    } catch (error) {
-      throw error
-    }
+    return pushNotificationsFcmRecord
   }
 }
