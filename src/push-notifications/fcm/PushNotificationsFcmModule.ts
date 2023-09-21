@@ -23,6 +23,7 @@ export class PushNotificationsFcmModule implements Module {
     // Repository
     dependencyManager.registerSingleton(PushNotificationsFcmRepository)
 
+    // Feature Registry
     featureRegistry.register(
       new Protocol({
         id: 'https://didcomm.org/push-notifications-fcm/1.0',

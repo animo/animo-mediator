@@ -41,20 +41,6 @@ export class PushNotificationsFcmApi {
   }
 
   /**
-   * Sends a set request with the fcm device info (token) to another agent via a `connectionId`
-   *
-   * @param connectionId The connection ID string
-   * @param deviceInfo The FCM device info
-   * @returns Promise<void>
-   */
-  public async setDeviceInfo(connectionId: string, deviceInfo: FcmDeviceInfo) {
-    const connection = await this.connectionService.getById(this.agentContext, connectionId)
-    connection.assertReady()
-
-    await this.pushNotificationsService.setDeviceInfo(this.agentContext, connection.id, deviceInfo)
-  }
-
-  /**
    * Sends the requested fcm device info (token) to another agent via a `connectionId`
    * Response for `push-notifications-fcm/get-device-info`
    *

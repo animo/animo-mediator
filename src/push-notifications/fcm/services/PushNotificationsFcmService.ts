@@ -1,37 +1,23 @@
 import type { FcmDeviceInfo } from '../models/FcmDeviceInfo'
-import type { AgentContext, InboundMessageContext } from '@aries-framework/core'
+import type { AgentContext, InboundMessageContext, Logger } from '@aries-framework/core'
 
-import { AriesFrameworkError } from '@aries-framework/core'
-import { Lifecycle, scoped } from 'tsyringe'
+import { AriesFrameworkError, inject, InjectionSymbols, injectable } from '@aries-framework/core'
 
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
 import { PushNotificationsFcmSetDeviceInfoMessage, PushNotificationsFcmDeviceInfoMessage } from '../messages'
 import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../repository'
 
-@scoped(Lifecycle.ContainerScoped)
+@injectable()
 export class PushNotificationsFcmService {
   private pushNotificationsFcmRepository: PushNotificationsFcmRepository
+  private logger: Logger
 
-  public constructor(pushNotificationsFcmRepository: PushNotificationsFcmRepository) {
+  public constructor(
+    pushNotificationsFcmRepository: PushNotificationsFcmRepository,
+    @inject(InjectionSymbols.Logger) logger: Logger
+  ) {
     this.pushNotificationsFcmRepository = pushNotificationsFcmRepository
-  }
-
-  public async setDeviceInfo(agentContext: AgentContext, connectionId: string, deviceInfo: FcmDeviceInfo) {
-    if (
-      (deviceInfo.deviceToken === null && deviceInfo.devicePlatform !== null) ||
-      (deviceInfo.deviceToken !== null && deviceInfo.devicePlatform === null)
-    )
-      throw new AriesFrameworkError('Both or none of deviceToken and devicePlatform must be null')
-
-    const pushNotificationsFcmSetDeviceInfoRecord = new PushNotificationsFcmRecord({
-      connectionId,
-      deviceToken: deviceInfo.deviceToken,
-      devicePlatform: deviceInfo.devicePlatform,
-    })
-
-    await this.pushNotificationsFcmRepository.save(agentContext, pushNotificationsFcmSetDeviceInfoRecord)
-
-    return pushNotificationsFcmSetDeviceInfoRecord
+    this.logger = logger
   }
 
   public createDeviceInfo(options: { threadId: string; deviceInfo: FcmDeviceInfo }) {
@@ -50,7 +36,7 @@ export class PushNotificationsFcmService {
   }
 
   public async processSetDeviceInfo(messageContext: InboundMessageContext<PushNotificationsFcmSetDeviceInfoMessage>) {
-    const { message } = messageContext
+    const { message, agentContext } = messageContext
     if (
       (message.deviceToken === null && message.devicePlatform !== null) ||
       (message.deviceToken !== null && message.devicePlatform === null)
@@ -62,26 +48,37 @@ export class PushNotificationsFcmService {
 
     const connection = messageContext.assertReadyConnection()
 
-    const pushNotificationsFcmRecord = new PushNotificationsFcmRecord({
+    let pushNotificationsFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
       connectionId: connection.id,
-      deviceToken: message.deviceToken,
-      devicePlatform: message.devicePlatform,
     })
 
-    await this.pushNotificationsFcmRepository.save(messageContext.agentContext, pushNotificationsFcmRecord)
+    if (pushNotificationsFcmRecord) {
+      if (pushNotificationsFcmRecord.deviceToken === message.deviceToken) {
+        this.logger.debug(`Device token is same for connection ${connection.id}. So skipping update`)
+        return
+      }
 
-    return pushNotificationsFcmRecord
+      // Update the record with new device token
+      pushNotificationsFcmRecord.deviceToken = message.deviceToken
+
+      this.logger.debug(`Device token changed for connection ${connection.id}. Updating record`)
+      await this.pushNotificationsFcmRepository.update(agentContext, pushNotificationsFcmRecord)
+    } else {
+      this.logger.debug(`No device info found for connection ${connection.id}. So creating new record`)
+
+      pushNotificationsFcmRecord = new PushNotificationsFcmRecord({
+        connectionId: connection.id,
+        deviceToken: message.deviceToken,
+        devicePlatform: message.devicePlatform,
+      })
+
+      await this.pushNotificationsFcmRepository.save(agentContext, pushNotificationsFcmRecord)
+    }
   }
 
   public async getDeviceInfo(agentContext: AgentContext, connectionId: string) {
-    const pushNotificationsFcmRecord = await this.pushNotificationsFcmRepository.getSingleByQuery(agentContext, {
+    return this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
       connectionId,
     })
-
-    if (!pushNotificationsFcmRecord) {
-      console.error(`No device info found for connection ${connectionId}`)
-    }
-
-    return pushNotificationsFcmRecord
   }
 }
