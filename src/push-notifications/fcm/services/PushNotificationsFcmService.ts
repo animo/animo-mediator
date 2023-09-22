@@ -1,7 +1,14 @@
 import type { FcmDeviceInfo } from '../models/FcmDeviceInfo'
 import type { AgentContext, InboundMessageContext, Logger } from '@aries-framework/core'
 
-import { AriesFrameworkError, inject, InjectionSymbols, injectable, RecordDuplicateError } from '@aries-framework/core'
+import {
+  AriesFrameworkError,
+  inject,
+  InjectionSymbols,
+  injectable,
+  RecordDuplicateError,
+  TransportService,
+} from '@aries-framework/core'
 
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
 import { PushNotificationsFcmSetDeviceInfoMessage, PushNotificationsFcmDeviceInfoMessage } from '../messages'
@@ -14,13 +21,16 @@ import { FIREBASE_NOTIFICATION_BODY, FIREBASE_NOTIFICATION_TITLE } from '../../.
 export class PushNotificationsFcmService {
   private pushNotificationsFcmRepository: PushNotificationsFcmRepository
   private logger: Logger
+  private transportService: TransportService
 
   public constructor(
     pushNotificationsFcmRepository: PushNotificationsFcmRepository,
+    transportService: TransportService,
     @inject(InjectionSymbols.Logger) logger: Logger
   ) {
     this.pushNotificationsFcmRepository = pushNotificationsFcmRepository
     this.logger = logger
+    this.transportService = transportService
   }
 
   public createDeviceInfo(options: { threadId: string; deviceInfo: FcmDeviceInfo }) {
@@ -81,6 +91,14 @@ export class PushNotificationsFcmService {
 
   public async sendNotification(agentContext: AgentContext, connectionId: string) {
     try {
+      // Get the session for the connection
+      const session = await this.transportService.findSessionByConnectionId(connectionId)
+
+      if (session) {
+        this.logger.info(`Connection ${connectionId} is active. So skip sending notification`)
+        return
+      }
+
       // Get the device token for the connection
       const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
         connectionId,
