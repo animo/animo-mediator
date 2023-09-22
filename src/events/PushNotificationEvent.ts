@@ -14,6 +14,13 @@ export const sendNotificationEvent = async (pushNotificationFcmRecord: PushNotif
         title: FIREBASE_NOTIFICATION_TITLE,
         body: FIREBASE_NOTIFICATION_BODY,
       },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'default',
+          },
+        },
+      },
       token: pushNotificationFcmRecord.deviceToken,
     }
     const response = await admin.messaging().send(message)
