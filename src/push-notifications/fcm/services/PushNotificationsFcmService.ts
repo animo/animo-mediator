@@ -1,11 +1,14 @@
 import type { FcmDeviceInfo } from '../models/FcmDeviceInfo'
 import type { AgentContext, InboundMessageContext, Logger } from '@aries-framework/core'
 
-import { AriesFrameworkError, inject, InjectionSymbols, injectable } from '@aries-framework/core'
+import { AriesFrameworkError, inject, InjectionSymbols, injectable, RecordDuplicateError } from '@aries-framework/core'
 
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
 import { PushNotificationsFcmSetDeviceInfoMessage, PushNotificationsFcmDeviceInfoMessage } from '../messages'
 import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../repository'
+
+import * as admin from 'firebase-admin'
+import { FIREBASE_NOTIFICATION_BODY, FIREBASE_NOTIFICATION_TITLE } from '../../../constants'
 
 @injectable()
 export class PushNotificationsFcmService {
@@ -76,9 +79,45 @@ export class PushNotificationsFcmService {
     }
   }
 
-  public async getDeviceInfo(agentContext: AgentContext, connectionId: string) {
-    return this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
-      connectionId,
-    })
+  public async sendNotification(agentContext: AgentContext, connectionId: string) {
+    try {
+      // Get the device token for the connection
+      const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
+        connectionId,
+      })
+
+      if (!pushNotificationFcmRecord?.deviceToken) {
+        this.logger.info(`No device token found for connectionId so skip sending notification`)
+        return
+      }
+
+      // Prepare a message to be sent to the device
+      const message = {
+        notification: {
+          title: FIREBASE_NOTIFICATION_TITLE,
+          body: FIREBASE_NOTIFICATION_BODY,
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: 'default',
+            },
+          },
+        },
+        token: pushNotificationFcmRecord.deviceToken,
+      }
+
+      this.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)
+      await admin.messaging().send(message)
+      this.logger.info(`Notification sent successfully to ${pushNotificationFcmRecord.connectionId}`)
+    } catch (error) {
+      if (error instanceof RecordDuplicateError) {
+        this.logger.error(`Multiple device info found for connectionId ${connectionId}`)
+      } else {
+        this.logger.error(`Error sending notification`, {
+          cause: error,
+        })
+      }
+    }
   }
 }

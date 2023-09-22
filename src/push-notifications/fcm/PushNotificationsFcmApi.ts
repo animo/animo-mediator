@@ -64,12 +64,12 @@ export class PushNotificationsFcmApi {
   }
 
   /**
-   * Get push notification record by `connectionId`
+   * Send push notification to device
    *
    * @param connectionId The connection ID string
-   * @returns Promise<PushNotificationsFcmRecord>
+   * @returns Promise<void>
    */
-  public async getDeviceInfoByConnectionId(connectionId: string) {
-    return this.pushNotificationsService.getDeviceInfo(this.agentContext, connectionId)
+  public async sendNotification(connectionId: string) {
+    return this.pushNotificationsService.sendNotification(this.agentContext, connectionId)
   }
 }
