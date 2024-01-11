@@ -142,16 +142,16 @@ export async function createAgent() {
 
   // Register all event handlers and initialize fcm module
   if (USE_PUSH_NOTIFICATIONS) {
-    initializeApp({
-      credential: credential.cert({
-        projectId: FIREBASE_PROJECT_ID,
-        clientEmail: FIREBASE_CLIENT_EMAIL,
-        privateKey: FIREBASE_PRIVATE_KEY,
-      }),
-    })
+    // initializeApp({
+    //   credential: credential.cert({
+    //     projectId: FIREBASE_PROJECT_ID,
+    //     clientEmail: FIREBASE_CLIENT_EMAIL,
+    //     privateKey: FIREBASE_PRIVATE_KEY,
+    //   }),
+    // })
     routingEvents(agent)
   }
-
+  
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server
   httpInboundTransport.server?.on('upgrade', (request, socket, head) => {
