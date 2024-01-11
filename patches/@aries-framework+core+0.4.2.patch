@@ -1,5 +1,5 @@
 diff --git a/node_modules/@aries-framework/core/build/modules/routing/RoutingEvents.d.ts b/node_modules/@aries-framework/core/build/modules/routing/RoutingEvents.d.ts
-index 578a26f..3cb7221 100644
+index 578a26f..ba1796a 100644
 --- a/node_modules/@aries-framework/core/build/modules/routing/RoutingEvents.d.ts
 +++ b/node_modules/@aries-framework/core/build/modules/routing/RoutingEvents.d.ts
 @@ -2,11 +2,12 @@ import type { KeylistUpdate } from './messages/KeylistUpdateMessage';
@@ -17,14 +17,16 @@ index 578a26f..3cb7221 100644
  }
  export interface RoutingCreatedEvent extends BaseEvent {
      type: typeof RoutingEventTypes.RoutingCreatedEvent;
-@@ -28,3 +29,9 @@ export interface KeylistUpdatedEvent extends BaseEvent {
+@@ -28,3 +29,11 @@ export interface KeylistUpdatedEvent extends BaseEvent {
          keylist: KeylistUpdate[];
      };
  }
++
 +export interface ForwardMessageEvent extends BaseEvent {
 +    type: typeof RoutingEventTypes.ForwardMessageEvent;
 +    payload: {
 +        connectionRecord: ConnectionRecord;
++        messageType: string;
 +    };
 +}
 diff --git a/node_modules/@aries-framework/core/build/modules/routing/RoutingEvents.js b/node_modules/@aries-framework/core/build/modules/routing/RoutingEvents.js
@@ -40,30 +42,34 @@ index ad9e68b..1aa5cb6 100644
  //# sourceMappingURL=RoutingEvents.js.map
 \ No newline at end of file
 diff --git a/node_modules/@aries-framework/core/build/modules/routing/handlers/ForwardHandler.js b/node_modules/@aries-framework/core/build/modules/routing/handlers/ForwardHandler.js
-index bb61eee..8e2069b 100644
+index bb61eee..e96615e 100644
 --- a/node_modules/@aries-framework/core/build/modules/routing/handlers/ForwardHandler.js
 +++ b/node_modules/@aries-framework/core/build/modules/routing/handlers/ForwardHandler.js
-@@ -12,6 +12,8 @@ class ForwardHandler {
+@@ -12,6 +12,12 @@ class ForwardHandler {
      async handle(messageContext) {
          const { encryptedMessage, mediationRecord } = await this.mediatorService.processForwardMessage(messageContext);
          const connectionRecord = await this.connectionService.getById(messageContext.agentContext, mediationRecord.connectionId);
++
++        console.log("messageContext.message ------", messageContext.message)
++        console.log("messageType ------", messageContext.message?.messageType)
++
 +        // Send forward message to the event emitter so that it can be picked up events
-+        await this.mediatorService.emitForwardEvent(messageContext.agentContext, connectionRecord);
++        await this.mediatorService.emitForwardEvent(messageContext.agentContext, connectionRecord, messageContext.message?.messageType);
          // The message inside the forward message is packed so we just send the packed
          // message to the connection associated with it
          await this.messageSender.sendPackage(messageContext.agentContext, {
 diff --git a/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.d.ts b/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.d.ts
-index e02dbab..ec9ba0d 100644
+index e02dbab..d007d8e 100644
 --- a/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.d.ts
 +++ b/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.d.ts
-@@ -2,6 +2,7 @@ import type { AgentContext } from '../../../agent';
- import type { InboundMessageContext } from '../../../agent/models/InboundMessageContext';
- import type { Query } from '../../../storage/StorageService';
- import type { EncryptedMessage } from '../../../types';
+@@ -11,6 +11,7 @@ import { MediatorRoutingRecord } from '../repository';
+ import { MediationRecord } from '../repository/MediationRecord';
+ import { MediationRepository } from '../repository/MediationRepository';
+ import { MediatorRoutingRepository } from '../repository/MediatorRoutingRepository';
 +import type { ConnectionRecord } from '../../connections';
- import type { ForwardMessage, MediationRequestMessage } from '../messages';
- import { EventEmitter } from '../../../agent/EventEmitter';
- import { Logger } from '../../../logger';
+ export declare class MediatorService {
+     private logger;
+     private mediationRepository;
 @@ -23,6 +24,7 @@ export declare class MediatorService {
          mediationRecord: MediationRecord;
          encryptedMessage: EncryptedMessage;
@@ -73,21 +79,34 @@ index e02dbab..ec9ba0d 100644
      createGrantMediationMessage(agentContext: AgentContext, mediationRecord: MediationRecord): Promise<{
          mediationRecord: MediationRecord;
 diff --git a/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.js b/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.js
-index ec8cd1b..2118939 100644
+index ec8cd1b..de911d5 100644
 --- a/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.js
 +++ b/node_modules/@aries-framework/core/build/modules/routing/services/MediatorService.js
-@@ -61,6 +61,14 @@ let MediatorService = class MediatorService {
+@@ -61,6 +61,15 @@ let MediatorService = class MediatorService {
              mediationRecord,
          };
      }
-+    async emitForwardEvent(agentContext, connectionRecord) {
++    async emitForwardEvent(agentContext, connectionRecord, messageType) {
 +        this.eventEmitter.emit(agentContext, {
 +            type: RoutingEvents_1.RoutingEventTypes.ForwardMessageEvent,
 +            payload: {
 +                connectionRecord,
++                messageType
 +            },
 +        });
 +    }
      async processKeylistUpdateRequest(messageContext) {
          // Assert Ready connection
          const connection = messageContext.assertReadyConnection();
+@@ -204,8 +213,8 @@ MediatorService = __decorate([
+     (0, plugins_1.injectable)(),
+     __param(3, (0, plugins_1.inject)(constants_1.InjectionSymbols.Logger)),
+     __metadata("design:paramtypes", [MediationRepository_1.MediationRepository,
+-        MediatorRoutingRepository_1.MediatorRoutingRepository,
+-        EventEmitter_1.EventEmitter, Object, connections_1.ConnectionService])
++    MediatorRoutingRepository_1.MediatorRoutingRepository,
++    EventEmitter_1.EventEmitter, Object, connections_1.ConnectionService])
+ ], MediatorService);
+ exports.MediatorService = MediatorService;
+ //# sourceMappingURL=MediatorService.js.map
+\ No newline at end of file

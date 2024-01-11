@@ -69,7 +69,7 @@ export class PushNotificationsFcmApi {
    * @param connectionId The connection ID string
    * @returns Promise<void>
    */
-  public async sendNotification(connectionId: string) {
-    return this.pushNotificationsService.sendNotification(this.agentContext, connectionId)
+  public async sendNotification(connectionId: string, messageType: string) {
+    return this.pushNotificationsService.sendNotification(this.agentContext, connectionId, messageType)
   }
 }
