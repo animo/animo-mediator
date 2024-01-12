@@ -13,29 +13,11 @@ import {
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
 import { PushNotificationsFcmSetDeviceInfoMessage, PushNotificationsFcmDeviceInfoMessage } from '../messages'
 import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../repository'
-
-import * as admin from 'firebase-admin'
-import { FIREBASE_NOTIFICATION_TITLE, NOTIFICATION_WEBHOOK_URL } from '../../../constants'
-import axios from 'axios';
-
-interface NotificationBody {
-  title?: string;
-  body?: string;
-}
-
-interface ApsPayload {
-  aps: {
-    sound: string;
-  };
-}
-
-interface Apns {
-  payload: ApsPayload;
-}
+import { NOTIFICATION_WEBHOOK_URL } from '../../../constants'
+import fetch from 'node-fetch'
 
 interface NotificationMessage {
-  notification: NotificationBody;
-  apns: Apns;
+  messageType: string;
   token: string;
   clientCode: string;
 }
@@ -118,7 +100,7 @@ export class PushNotificationsFcmService {
     try {
       // Get the session for the connection
       // const session = await this.transportService.findSessionByConnectionId(connectionId)
-      
+
       // if (session) {
       //   this.logger.info(`Connection ${connectionId} is active. So skip sending notification`)
       //   return
@@ -129,25 +111,15 @@ export class PushNotificationsFcmService {
         connectionId,
       })
 
-      if (!pushNotificationFcmRecord?.deviceToken) {
-        this.logger.info(`No device token found for connectionId so skip sending notification`)
-        return
-      }
+      // if (!pushNotificationFcmRecord?.deviceToken) {
+      //   this.logger.info(`No device token found for connectionId so skip sending notification`)
+      //   return
+      // }
 
 
       // Prepare a message to be sent to the device
       const message: NotificationMessage = {
-        notification: {
-          title: FIREBASE_NOTIFICATION_TITLE,
-          body: messageType,
-        },
-        apns: {
-          payload: {
-            aps: {
-              sound: 'default',
-            },
-          },
-        },
+        messageType,
         token: pushNotificationFcmRecord?.deviceToken || '',
         clientCode: pushNotificationFcmRecord?.clientCode || ''
       }
@@ -169,16 +141,38 @@ export class PushNotificationsFcmService {
 
   public async processNotification(message: NotificationMessage) {
     try {
-      if (NOTIFICATION_WEBHOOK_URL) {
-        const payload = {
-          fcmToken: message.token || '',
-          '@type': message.notification.body,
-          clientCode: message.clientCode || '5b4d6bc6-362e-4f53-bdad-ee2742bc0de3'
-        }
-        await axios.post(NOTIFICATION_WEBHOOK_URL, payload);
-      } else {
+      if (!NOTIFICATION_WEBHOOK_URL) {
         this.logger.error("Notification webhook URL not found");
+        return
       }
+
+      const body = {
+        fcmToken: message.token || 'abc',
+        messageType: message.messageType,
+        clientCode: message.clientCode || '5b4d6bc6-362e-4f53-bdad-ee2742bc0de3'
+      }
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+      };
+
+      fetch(NOTIFICATION_WEBHOOK_URL, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            this.logger.error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          this.logger.debug(`Data: ${data}`);
+        })
+        .catch(error => {
+          this.logger.error(`Error: ${error}`);
+        });
+
     } catch (error) {
       this.logger.error(`Error sending notification`, {
         cause: error,
@@ -186,3 +180,5 @@ export class PushNotificationsFcmService {
     }
   }
 }
+
+

@@ -23,10 +23,8 @@ import {
   AGENT_ENDPOINTS,
   AGENT_NAME,
   AGENT_PORT,
-  FIREBASE_CLIENT_EMAIL,
-  FIREBASE_PRIVATE_KEY,
-  FIREBASE_PROJECT_ID,
   LOG_LEVEL,
+  NOTIFICATION_WEBHOOK_URL,
   POSTGRES_HOST,
   USE_PUSH_NOTIFICATIONS,
   WALLET_KEY,
@@ -141,14 +139,7 @@ export async function createAgent() {
   await agent.initialize()
 
   // Register all event handlers and initialize fcm module
-  if (USE_PUSH_NOTIFICATIONS) {
-    // initializeApp({
-    //   credential: credential.cert({
-    //     projectId: FIREBASE_PROJECT_ID,
-    //     clientEmail: FIREBASE_CLIENT_EMAIL,
-    //     privateKey: FIREBASE_PRIVATE_KEY,
-    //   }),
-    // })
+  if (USE_PUSH_NOTIFICATIONS && NOTIFICATION_WEBHOOK_URL) {
     routingEvents(agent)
   }
   
