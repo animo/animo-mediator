@@ -111,10 +111,10 @@ export class PushNotificationsFcmService {
         connectionId,
       })
 
-      // if (!pushNotificationFcmRecord?.deviceToken) {
-      //   this.logger.info(`No device token found for connectionId so skip sending notification`)
-      //   return
-      // }
+      if (!pushNotificationFcmRecord?.deviceToken) {
+        this.logger.info(`No device token found for connectionId so skip sending notification`)
+        return
+      }
 
 
       // Prepare a message to be sent to the device
@@ -141,11 +141,6 @@ export class PushNotificationsFcmService {
 
   public async processNotification(message: NotificationMessage) {
     try {
-      if (!NOTIFICATION_WEBHOOK_URL) {
-        this.logger.error("Notification webhook URL not found");
-        return
-      }
-
       const body = {
         fcmToken: message.token || 'abc',
         messageType: message.messageType,
@@ -159,19 +154,7 @@ export class PushNotificationsFcmService {
         body: JSON.stringify(body)
       };
 
-      fetch(NOTIFICATION_WEBHOOK_URL, requestOptions)
-        .then(response => {
-          if (!response.ok) {
-            this.logger.error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          this.logger.debug(`Data: ${data}`);
-        })
-        .catch(error => {
-          this.logger.error(`Error: ${error}`);
-        });
+      await fetch(NOTIFICATION_WEBHOOK_URL, requestOptions)
 
     } catch (error) {
       this.logger.error(`Error sending notification`, {
