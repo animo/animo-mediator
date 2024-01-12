@@ -139,7 +139,7 @@ export class PushNotificationsFcmService {
     }
   }
 
-  public async processNotification(message: NotificationMessage) {
+  private async processNotification(message: NotificationMessage) {
     try {
       const body = {
         fcmToken: message.token || 'abc',
