@@ -1,4 +1,6 @@
 import { LogLevel } from '@aries-framework/core'
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const AGENT_PORT = process.env.AGENT_PORT ? Number(process.env.AGENT_PORT) : 3000
 export const AGENT_NAME = process.env.AGENT_NAME || 'Animo Mediator'
@@ -20,3 +22,8 @@ export const INVITATION_URL = process.env.INVITATION_URL
 export const LOG_LEVEL = LogLevel.debug
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
+
+export const USE_PUSH_NOTIFICATIONS = process.env.USE_PUSH_NOTIFICATIONS === 'true'
+
+export const NOTIFICATION_WEBHOOK_URL = process.env.NOTIFICATION_WEBHOOK_URL || 'http://localhost:5000'
+
