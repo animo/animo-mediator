@@ -1,7 +1,7 @@
 import type { PushNotificationsFcmProblemReportReason } from './PushNotificationsFcmProblemReportReason'
-import type { ProblemReportErrorOptions } from '@aries-framework/core'
+import type { ProblemReportErrorOptions } from '@credo-ts/core'
 
-import { ProblemReportError } from '@aries-framework/core'
+import { ProblemReportError } from '@credo-ts/core'
 
 import { PushNotificationsFcmProblemReportMessage } from '../messages'
 

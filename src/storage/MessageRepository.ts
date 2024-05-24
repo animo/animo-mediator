@@ -6,7 +6,7 @@ import {
   InjectionSymbols,
   Repository,
   StorageService,
-} from '@aries-framework/core'
+} from '@credo-ts/core'
 
 import { MessageRecord } from './MessageRecord'
 

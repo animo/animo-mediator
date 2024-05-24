@@ -1,11 +1,9 @@
-import type { DependencyManager, Module } from '@aries-framework/core'
+import { InjectionSymbols, type DependencyManager, type Module } from '@credo-ts/core'
 
-import { MessageRepository } from './MessageRepository'
 import { StorageServiceMessageQueue } from './StorageMessageQueue'
 
 export class StorageMessageQueueModule implements Module {
   public register(dependencyManager: DependencyManager) {
-    dependencyManager.registerContextScoped(StorageServiceMessageQueue)
-    dependencyManager.registerSingleton(MessageRepository)
+    dependencyManager.registerSingleton(InjectionSymbols.MessagePickupRepository, StorageServiceMessageQueue)
   }
 }

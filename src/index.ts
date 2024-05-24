@@ -1,4 +1,4 @@
-import { OutOfBandRepository, OutOfBandRole, OutOfBandState } from '@aries-framework/core'
+import { OutOfBandRepository, OutOfBandRole, OutOfBandState } from '@credo-ts/core'
 
 import { createAgent } from './agent'
 import { INVITATION_URL } from './constants'

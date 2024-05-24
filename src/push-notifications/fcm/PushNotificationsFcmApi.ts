@@ -1,12 +1,6 @@
 import type { FcmDeviceInfo } from './models'
 
-import {
-  OutboundMessageContext,
-  AgentContext,
-  ConnectionService,
-  injectable,
-  MessageSender,
-} from '@aries-framework/core'
+import { OutboundMessageContext, AgentContext, ConnectionService, injectable, MessageSender } from '@credo-ts/core'
 
 import { PushNotificationsFcmService } from './services/PushNotificationsFcmService'
 import {
@@ -61,15 +55,5 @@ export class PushNotificationsFcmApi {
       connection: connection,
     })
     await this.messageSender.sendMessage(outbound)
-  }
-
-  /**
-   * Send push notification to device
-   *
-   * @param connectionId The connection ID string
-   * @returns Promise<void>
-   */
-  public async sendNotification(connectionId: string, messageType: string) {
-    return this.pushNotificationsService.sendNotification(this.agentContext, connectionId, messageType)
   }
 }
