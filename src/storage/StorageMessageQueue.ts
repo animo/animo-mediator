@@ -12,7 +12,7 @@ import { injectable, AgentContext, utils } from '@credo-ts/core'
 import { MessageRecord } from './MessageRecord'
 import { MessageRepository } from './MessageRepository'
 import { PushNotificationsFcmRepository } from '../push-notifications/fcm/repository'
-import { NOTIFICATION_WEBHOOK_URL } from '../constants'
+import { NOTIFICATION_WEBHOOK_URL, USE_PUSH_NOTIFICATIONS } from '../constants'
 import fetch from 'node-fetch'
 
 export interface NotificationMessage {
@@ -91,7 +91,9 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
     )
 
     // Send a notification to the device
-    await this.sendNotification(this.agentContext, connectionId, messageType)
+    if (USE_PUSH_NOTIFICATIONS && NOTIFICATION_WEBHOOK_URL) {
+      await this.sendNotification(this.agentContext, connectionId, messageType)
+    }
 
     return id
   }

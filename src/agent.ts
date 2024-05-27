@@ -19,22 +19,11 @@ import type { Socket } from 'net'
 import express from 'express'
 import { Server } from 'ws'
 
-import {
-  AGENT_ENDPOINTS,
-  AGENT_NAME,
-  AGENT_PORT,
-  LOG_LEVEL,
-  NOTIFICATION_WEBHOOK_URL,
-  POSTGRES_HOST,
-  USE_PUSH_NOTIFICATIONS,
-  WALLET_KEY,
-  WALLET_NAME,
-} from './constants'
+import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
-import { routingEvents } from './events/RoutingEvents'
 
 function createModules() {
   const modules = {
@@ -135,11 +124,6 @@ export async function createAgent() {
   })
 
   await agent.initialize()
-
-  // Register all event handlers and initialize fcm module
-  if (USE_PUSH_NOTIFICATIONS && NOTIFICATION_WEBHOOK_URL) {
-    routingEvents(agent)
-  }
 
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server
