@@ -1,4 +1,4 @@
-import { AskarModule, AskarMultiWalletDatabaseScheme } from '@aries-framework/askar'
+import { AskarModule, AskarMultiWalletDatabaseScheme } from '@credo-ts/askar'
 import {
   Agent,
   CacheModule,
@@ -11,8 +11,8 @@ import {
   OutOfBandState,
   WalletConfig,
   WsOutboundTransport,
-} from '@aries-framework/core'
-import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@aries-framework/node'
+} from '@credo-ts/core'
+import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@credo-ts/node'
 import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 import type { Socket } from 'net'
 
@@ -35,12 +35,10 @@ import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
 import { routingEvents } from './events/RoutingEvents'
-import { initializeApp } from 'firebase-admin/app'
-import { credential } from 'firebase-admin'
 
 function createModules() {
   const modules = {
-    StorageModule: new StorageMessageQueueModule(),
+    storageModule: new StorageMessageQueueModule(),
     cache: new CacheModule({
       cache: new InMemoryLruCache({ limit: 500 }),
     }),
@@ -142,7 +140,7 @@ export async function createAgent() {
   if (USE_PUSH_NOTIFICATIONS && NOTIFICATION_WEBHOOK_URL) {
     routingEvents(agent)
   }
-  
+
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server
   httpInboundTransport.server?.on('upgrade', (request, socket, head) => {

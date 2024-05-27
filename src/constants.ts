@@ -1,11 +1,11 @@
-import { LogLevel } from '@aries-framework/core'
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { LogLevel } from '@credo-ts/core'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 export const AGENT_PORT = process.env.AGENT_PORT ? Number(process.env.AGENT_PORT) : 3000
-export const AGENT_NAME = process.env.AGENT_NAME || 'Animo Mediator'
-export const WALLET_NAME = process.env.WALLET_NAME || 'animo-mediator-dev'
-export const WALLET_KEY = process.env.WALLET_KEY || 'animo-mediator-dev'
+export const AGENT_NAME = process.env.AGENT_NAME || 'CREDEBL Mediator'
+export const WALLET_NAME = process.env.WALLET_NAME || 'credebl-mediator-dev'
+export const WALLET_KEY = process.env.WALLET_KEY || 'credebl-mediator-dev'
 export const AGENT_ENDPOINTS = process.env.AGENT_ENDPOINTS?.split(',') ?? [
   `http://localhost:${AGENT_PORT}`,
   `ws://localhost:${AGENT_PORT}`,
@@ -26,4 +26,3 @@ export const IS_DEV = process.env.NODE_ENV === 'development'
 export const USE_PUSH_NOTIFICATIONS = process.env.USE_PUSH_NOTIFICATIONS === 'true'
 
 export const NOTIFICATION_WEBHOOK_URL = process.env.NOTIFICATION_WEBHOOK_URL || 'http://localhost:5000'
-
