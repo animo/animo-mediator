@@ -3,11 +3,11 @@ FROM ubuntu:20.04 as base
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -y && apt-get install -y \
-    apt-transport-https \
-    curl \
-    make \
-    gcc \
-    g++
+  apt-transport-https \
+  curl \
+  make \
+  gcc \
+  g++
 
 # nodejs
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
@@ -28,6 +28,9 @@ WORKDIR /www
 COPY package.json /www/package.json
 COPY yarn.lock /www/yarn.lock
 
+# Copy patches folder
+COPY patches /www/patches
+
 # Run yarn install
 RUN yarn install
 
@@ -46,6 +49,9 @@ COPY --from=setup /tmp/yarn-cache /tmp/yarn-cache
 # Copy root package files and mediator app package
 COPY package.json /www/package.json
 COPY yarn.lock /www/yarn.lock
+
+# Copy patches folder
+COPY patches /www/patches
 
 WORKDIR /www
 
