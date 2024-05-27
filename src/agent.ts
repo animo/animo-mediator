@@ -85,6 +85,7 @@ export async function createAgent() {
       // FIXME: We should probably remove this at some point, but it will require custom logic
       // Also, doesn't work with multi-tenancy yet
       autoUpdateStorageOnStartup: true,
+      backupBeforeStorageUpdate: false,
       didCommMimeType: DidCommMimeType.V0,
     },
     dependencies: agentDependencies,
