@@ -28,9 +28,6 @@ import { PushNotificationsFcmModule } from './push-notifications/fcm'
 function createModules() {
   const modules = {
     storageModule: new StorageMessageQueueModule(),
-    cache: new CacheModule({
-      cache: new InMemoryLruCache({ limit: 500 }),
-    }),
     connections: new ConnectionsModule({
       autoAcceptConnections: true,
     }),
@@ -82,8 +79,6 @@ export async function createAgent() {
       walletConfig: walletConfig,
       useDidSovPrefixWhereAllowed: true,
       logger: logger,
-      // FIXME: We should probably remove this at some point, but it will require custom logic
-      // Also, doesn't work with multi-tenancy yet
       autoUpdateStorageOnStartup: true,
       backupBeforeStorageUpdate: false,
       didCommMimeType: DidCommMimeType.V0,
@@ -105,6 +100,11 @@ export async function createAgent() {
   agent.registerOutboundTransport(httpOutboundTransport)
   agent.registerInboundTransport(wsInboundTransport)
   agent.registerOutboundTransport(wsOutboundTransport)
+
+  // Added health check endpoint
+  httpInboundTransport.app.get('/health', async (_req, res) => {
+    res.status(200).send('Ok')
+  })
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   httpInboundTransport.app.get('/invite', async (req, res) => {
