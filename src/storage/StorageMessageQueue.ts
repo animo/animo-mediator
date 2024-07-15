@@ -42,6 +42,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
 
     const messageRecords = await this.messageRepository.findByConnectionId(this.agentContext, connectionId)
 
+    this.agentContext.config.logger.debug(`Found ${messageRecords.length} messages for connection ${connectionId}`)
+
     return messageRecords.length
   }
 
@@ -100,6 +102,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
 
   public async removeMessages(options: RemoveMessagesOptions) {
     const { messageIds } = options
+
+    this.agentContext.config.logger.debug(`Removing message ids ${messageIds}`)
 
     const deletePromises = messageIds.map((messageId) =>
       this.messageRepository.deleteById(this.agentContext, messageId)

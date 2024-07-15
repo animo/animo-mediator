@@ -10,7 +10,7 @@ RUN apt-get update -y && apt-get install -y \
   g++
 
 # nodejs
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash
 
 # install depdencies and enable corepack
 RUN apt-get update -y && apt-get install -y --allow-unauthenticated nodejs
