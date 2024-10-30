@@ -1,0 +1,18 @@
+name: mediator-agent
+id: ari:cloud:compass:6095931c-8137-4ae1-822a-2d7411835fc7:component/9029b47a-062e-4e25-a761-a2c0fc9ebd98/1808a975-2eb6-4535-9e65-5ebc4d0bdf51
+description: An easy to set-up Aries and DIDComm v1 mediator built on Aries Framework JavaScript.
+configVersion: 1
+typeId: SERVICE
+ownerId: ari:cloud:identity::team/6fe50e36-8efb-47a6-aab5-ea47bd10ec4e
+fields:
+  tier: 4
+links:
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/credebl/mediator-agent
+relationships:
+  DEPENDS_ON: []
+labels:
+  - language:typescript
+  - source:github
+customFields: null
