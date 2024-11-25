@@ -16,7 +16,7 @@ import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@cr
 import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 import type { Socket } from 'net'
 
-import express from 'express'
+import express, { response } from 'express'
 import { Server } from 'ws'
 
 import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
@@ -24,7 +24,7 @@ import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
-
+import axios from 'axios'
 function createModules() {
   const modules = {
     storageModule: new StorageMessageQueueModule(),
@@ -122,6 +122,72 @@ export async function createAgent() {
       return res.status(400).send(`No invitation found for _oobid ${req.query._oobid}`)
     }
     return res.send(outOfBandRecord.outOfBandInvitation.toJSON())
+  })
+  httpInboundTransport.app.use(express.json())
+
+  httpInboundTransport.app.post('/connect', async (req, res) => {
+    logger.info('httpInboundTransport.connect')
+    logger.info('Incoming request /connect', {
+      method: req.method,
+      url: req.originalUrl,
+      headers: req.headers,
+      body: req.body,
+    })
+
+    const sendUrl = req.body.meta.send
+
+    if (!sendUrl) {
+      logger.error('Missing "send" URL in request body')
+      return res.status(400).send('Missing "send" URL')
+    }
+
+    try {
+      const response = await axios.post(sendUrl, {
+        message: 'Response from /connect endpoint',
+        status: 'success',
+        data: { data: 'Hello from one' },
+      })
+
+      logger.info('Response from send URL:', response.data)
+
+      res.status(200).send(`Message sent successfully ${response}`)
+    } catch (error) {
+      res.status(500).send('Error sending response to send URL')
+    }
+  })
+
+  httpInboundTransport.app.post('/message', async (req, res) => {
+    logger.info('httpInboundTransport.message')
+    logger.info('Incoming request /message', {
+      method: req.method,
+      url: req.originalUrl,
+      headers: req.headers,
+      body: req.body,
+    })
+
+    const sendUrl = req.body.meta.send
+
+    try {
+      const response = await axios.post(sendUrl, {
+        message: 'Response from /message endpoint',
+        status: 'success',
+        data: { data: 'Hello from one' },
+      })
+
+      logger.info('Response from send URL:', response.data)
+
+      res.status(200).send(`Message sent successfully ${response}`)
+    } catch (error) {
+      res.status(500).send('Error sending response to send URL')
+    }
+  })
+
+  httpInboundTransport.app.post('/disconnect', async (req, res) => {
+    logger.info('httpInboundTransport.disconnect')
+    const { connection_id } = req.body
+    logger.info(`removed connection, ${connection_id}`)
+    //TODO : Remove connection from socket
+    //  res.status(200).send(`removed connection : ${connection_id}`)
   })
 
   await agent.initialize()
