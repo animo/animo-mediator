@@ -19,5 +19,5 @@ export async function processInboundMessage(req: Request, res: Response, agent: 
     if (!res.headersSent) {
       res.status(500).send('Error processing message')
     }
-  } 
+  }
 }
