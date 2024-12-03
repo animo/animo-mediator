@@ -9,6 +9,7 @@ import {
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
+  TransportService,
   WalletConfig,
   WsOutboundTransport,
 } from '@credo-ts/core'
@@ -18,13 +19,25 @@ import type { Socket } from 'net'
 
 import express, { response } from 'express'
 import { Server } from 'ws'
+import { registerSocketDockRoutes } from './transport/SocketDockInboundTransport'
 
-import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
+import {
+  AGENT_ENDPOINTS,
+  AGENT_NAME,
+  AGENT_PORT,
+  LOG_LEVEL,
+  POSTGRES_HOST,
+  USE_SOCKETDOCK,
+  WALLET_KEY,
+  WALLET_NAME,
+} from './constants'
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
-import axios from 'axios'
+
+import { SocketIdsManager } from './transport/SocketIdManager'
+
 function createModules() {
   const modules = {
     storageModule: new StorageMessageQueueModule(),
@@ -92,14 +105,17 @@ export async function createAgent() {
   // Create all transports
   const httpInboundTransport = new HttpInboundTransport({ app, port: AGENT_PORT })
   const httpOutboundTransport = new HttpOutboundTransport()
-  const wsInboundTransport = new WsInboundTransport({ server: socketServer })
-  const wsOutboundTransport = new WsOutboundTransport()
 
   // Register all Transports
   agent.registerInboundTransport(httpInboundTransport)
   agent.registerOutboundTransport(httpOutboundTransport)
-  agent.registerInboundTransport(wsInboundTransport)
-  agent.registerOutboundTransport(wsOutboundTransport)
+
+  if (USE_SOCKETDOCK === 'false') {
+    const wsInboundTransport = new WsInboundTransport({ server: socketServer })
+    const wsOutboundTransport = new WsOutboundTransport()
+    agent.registerInboundTransport(wsInboundTransport)
+    agent.registerOutboundTransport(wsOutboundTransport)
+  }
 
   // Added health check endpoint
   httpInboundTransport.app.get('/health', async (_req, res) => {
@@ -123,74 +139,14 @@ export async function createAgent() {
     }
     return res.send(outOfBandRecord.outOfBandInvitation.toJSON())
   })
+
   httpInboundTransport.app.use(express.json())
 
-  httpInboundTransport.app.post('/connect', async (req, res) => {
-    logger.info('httpInboundTransport.connect')
-    logger.info('Incoming request /connect', {
-      method: req.method,
-      url: req.originalUrl,
-      headers: req.headers,
-      body: req.body,
-    })
-
-    const sendUrl = req.body.meta.send
-
-    if (!sendUrl) {
-      logger.error('Missing "send" URL in request body')
-      return res.status(400).send('Missing "send" URL')
-    }
-
-    try {
-      const response = await axios.post(sendUrl, {
-        message: 'Response from /connect endpoint',
-        status: 'success',
-        data: { data: 'Hello from one' },
-      })
-
-      logger.info('Response from send URL:', response.data)
-
-      res.status(200).send(`Message sent successfully ${response}`)
-    } catch (error) {
-      res.status(500).send('Error sending response to send URL')
-    }
-  })
-
-  httpInboundTransport.app.post('/message', async (req, res) => {
-    logger.info('httpInboundTransport.message')
-    logger.info('Incoming request /message', {
-      method: req.method,
-      url: req.originalUrl,
-      headers: req.headers,
-      body: req.body,
-    })
-
-    const sendUrl = req.body.meta.send
-
-    try {
-      const response = await axios.post(sendUrl, {
-        message: 'Response from /message endpoint',
-        status: 'success',
-        data: { data: 'Hello from one' },
-      })
-
-      logger.info('Response from send URL:', response.data)
-
-      res.status(200).send(`Message sent successfully ${response}`)
-    } catch (error) {
-      res.status(500).send('Error sending response to send URL')
-    }
-  })
-
-  httpInboundTransport.app.post('/disconnect', async (req, res) => {
-    logger.info('httpInboundTransport.disconnect')
-    const { connection_id } = req.body
-    logger.info(`removed connection, ${connection_id}`)
-    //TODO : Remove connection from socket
-    //  res.status(200).send(`removed connection : ${connection_id}`)
-  })
-
   await agent.initialize()
+  if (USE_SOCKETDOCK === 'true') {
+    const socketIdManager = SocketIdsManager.getInstance()
+    await registerSocketDockRoutes(app, logger, socketIdManager, agent)
+  }
 
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server

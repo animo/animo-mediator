@@ -8,7 +8,7 @@ export const WALLET_NAME = process.env.WALLET_NAME || 'credebl-mediator-dev'
 export const WALLET_KEY = process.env.WALLET_KEY || 'credebl-mediator-dev'
 export const AGENT_ENDPOINTS = process.env.AGENT_ENDPOINTS?.split(',') ?? [
   `http://localhost:${AGENT_PORT}`,
-  `ws://localhost:${AGENT_PORT}`,
+  `ws://localhost:8765/ws`,
 ]
 
 export const POSTGRES_HOST = process.env.POSTGRES_HOST
@@ -18,6 +18,8 @@ export const POSTGRES_ADMIN_USER = process.env.POSTGRES_ADMIN_USER
 export const POSTGRES_ADMIN_PASSWORD = process.env.POSTGRES_ADMIN_PASSWORD
 
 export const INVITATION_URL = process.env.INVITATION_URL
+
+export const USE_SOCKETDOCK = process.env.USE_SOCKETDOCK || 'true'
 
 export const LOG_LEVEL = LogLevel.debug
 
