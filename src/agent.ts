@@ -9,7 +9,6 @@ import {
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
-  TransportService,
   WalletConfig,
   WsOutboundTransport,
 } from '@credo-ts/core'
@@ -17,7 +16,7 @@ import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@cr
 import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 import type { Socket } from 'net'
 
-import express, { response } from 'express'
+import express from 'express'
 import { Server } from 'ws'
 import { registerSocketDockRoutes } from './transport/SocketDockInboundTransport'
 
