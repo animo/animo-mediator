@@ -21,7 +21,7 @@ export class SocketDockInboundTransport implements InboundTransport {
         throw new Error('ConnectionId is not sent from socketDock server')
       }
 
-      const socketId = this.activeConnections[connectionId] as string
+      const socketId = this.activeConnections[connectionId]
       if (!socketId) {
         this.activeConnections[socketId] = socketId
         this.logger.debug(`Saving new socketId : ${connectionId}`)
