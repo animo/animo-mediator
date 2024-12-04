@@ -1,56 +1,73 @@
 import { Express } from 'express'
-import { SocketIdsManager } from './SocketIdManager'
-import { processInboundMessage } from './ProcessInboundMessage'
 import { Logger } from '../logger'
-import { Agent } from '@credo-ts/core'
+import { Agent, InboundTransport } from '@credo-ts/core'
+import { WebSocketTransportSession } from './SocketDockTransportSession'
 
-export function registerSocketDockRoutes(
-  app: Express,
-  logger: Logger,
-  socketIdManager: SocketIdsManager,
-  agent: Agent
-) {
-  app.post('/connect', async (req, res) => {
-    logger.info('httpInboundTransport.connect')
-    const sendUrl = req.body.meta.send
-    const connectionId = req.body.meta.connection_id
+export class SocketDockInboundTransport implements InboundTransport {
+  private app: Express
+  private logger: Logger
+  private agent: Agent
+  private active_connections: Record<string, unknown> = {}
 
-    const socketId = socketIdManager.getConnectionBySocketId(connectionId)
-    if (!socketId) {
-      socketIdManager.addSocketId(connectionId)
-      logger.debug(`Saving new socketId : ${connectionId}`)
-    }
+  constructor(app: Express, logger: Logger, agent: Agent) {
+    this.app = app
+    this.logger = logger
+    this.agent = agent
+  }
 
-    if (!sendUrl) {
-      logger.error('Missing "send" URL in request body')
-      return res.status(400).send('Missing "send" URL')
-    }
+  async start(agent: Agent<any>): Promise<void> {
+    this.app.post('/connect', async (req, res) => {
+      this.logger.info('SocketDockInboundTransport.connect')
+      const sendUrl = req.body.meta.send
+      const connectionId = req.body.meta.connection_id
 
-    try {
-      res.status(200).send(`connection with socketId : ${connectionId} added successfully`)
-    } catch (error) {
-      res.status(500).send('Error sending response to send URL')
-    }
-  })
+      const socketId = this.active_connections[connectionId] as string
+      if (!socketId) {
+        this.active_connections[socketId] = socketId
+        this.logger.debug(`Saving new socketId : ${connectionId}`)
+      }
 
-  app.post('/message', async (req, res) => {
-    logger.info('httpInboundTransport.message')
+      try {
+        res.status(200).send(`connection with socketId : ${connectionId} added successfully`)
+      } catch (error) {
+        res.status(500).send('Error sending response to send URL')
+      }
+    })
 
-    const connectionId = req.body.meta.connection_id
+    this.app.post('/message', async (req, res) => {
+      this.logger.info('SocketDockInboundTransport.message')
 
-    try {
-      const socketId = socketIdManager.getConnectionBySocketId(connectionId)
-      await processInboundMessage(req, res, agent, socketId)
-    } catch (error) {
-      res.status(500).send('Error sending response to send URL')
-    }
-  })
+      const connectionId = req.body.meta.connection_id
 
-  app.post('/disconnect', async (req, res) => {
-    logger.info('httpInboundTransport.disconnect')
-    const { connection_id } = req.body
-    socketIdManager.removeSocketId(connection_id)
-    logger.debug(`removed connection with socketId : ${connection_id}`)
-    res.status(200).send(`connection with socketId : ${connection_id} removed successfully`)
-  })
+      try {
+        const socketId = this.active_connections[connectionId] as string
+        const sendUrl = req.body.meta.send
+        const requestMimeType = req.headers['content-type']
+        const session = new WebSocketTransportSession(socketId, res, sendUrl, requestMimeType)
+        const message = req.body.message
+        const encryptedMessage = JSON.parse(message)
+        await agent.receiveMessage(encryptedMessage, session)
+        if (!res.headersSent) {
+          res.status(200).end()
+        }
+      } catch (error) {
+        if (!res.headersSent) {
+          res.status(500).send('Error processing message')
+        }
+      }
+    })
+
+    this.app.post('/disconnect', async (req, res) => {
+      this.logger.info('SocketDockInboundTransport.disconnect')
+      const { connection_id } = req.body
+
+      delete this.active_connections[connection_id]
+      this.logger.debug(`removed connection with socketId : ${connection_id}`)
+      res.status(200).send(`connection with socketId : ${connection_id} removed successfully`)
+    })
+  }
+
+  stop(): Promise<void> {
+    throw new Error('Method not implemented.')
+  }
 }

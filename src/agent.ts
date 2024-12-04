@@ -18,7 +18,7 @@ import type { Socket } from 'net'
 
 import express from 'express'
 import { Server } from 'ws'
-import { registerSocketDockRoutes } from './transport/SocketDockInboundTransport'
+import { SocketDockInboundTransport } from './transport/SocketDockInboundTransport'
 
 import {
   AGENT_ENDPOINTS,
@@ -34,8 +34,6 @@ import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
-
-import { SocketIdsManager } from './transport/SocketIdManager'
 
 function createModules() {
   const modules = {
@@ -114,6 +112,8 @@ export async function createAgent() {
     const wsOutboundTransport = new WsOutboundTransport()
     agent.registerInboundTransport(wsInboundTransport)
     agent.registerOutboundTransport(wsOutboundTransport)
+  } else {
+    agent.registerInboundTransport(new SocketDockInboundTransport(app, logger, agent))
   }
 
   // Added health check endpoint
@@ -142,10 +142,6 @@ export async function createAgent() {
   httpInboundTransport.app.use(express.json())
 
   await agent.initialize()
-  if (USE_SOCKETDOCK === 'true') {
-    const socketIdManager = SocketIdsManager.getInstance()
-    await registerSocketDockRoutes(app, logger, socketIdManager, agent)
-  }
 
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server
