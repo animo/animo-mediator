@@ -1,4 +1,4 @@
-import { AgentContext, DidCommMimeType, EncryptedMessage, TransportSession } from '@credo-ts/core'
+import { Agent, AgentContext, DidCommMimeType, EncryptedMessage, TransportSession } from '@credo-ts/core'
 import type { Response } from 'express'
 import { CredoError } from '@credo-ts/core'
 
@@ -20,11 +20,7 @@ export class WebSocketTransportSession implements TransportSession {
     this.requestMimeType = requestMimeType
   }
 
-  public async close(): Promise<void> {
-    if (!this.res.headersSent) {
-      this.res.status(200).end()
-    }
-  }
+  public async close() {}
 
   public async send(agentContext: AgentContext, encryptedMessage: EncryptedMessage): Promise<void> {
     if (this.res.headersSent) {
