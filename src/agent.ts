@@ -113,7 +113,7 @@ export async function createAgent() {
     agent.registerInboundTransport(wsInboundTransport)
     agent.registerOutboundTransport(wsOutboundTransport)
   } else {
-    agent.registerInboundTransport(new SocketDockInboundTransport(app, logger, agent))
+    agent.registerInboundTransport(new SocketDockInboundTransport(app, logger))
   }
 
   // Added health check endpoint

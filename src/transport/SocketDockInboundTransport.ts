@@ -6,16 +6,14 @@ import { WebSocketTransportSession } from './SocketDockTransportSession'
 export class SocketDockInboundTransport implements InboundTransport {
   private app: Express
   private logger: Logger
-  private agent: Agent
-  private active_connections: Record<string, unknown> = {}
+  private active_connections: Record<string, string> = {}
 
-  constructor(app: Express, logger: Logger, agent: Agent) {
+  constructor(app: Express, logger: Logger) {
     this.app = app
     this.logger = logger
-    this.agent = agent
   }
 
-  async start(agent: Agent<any>): Promise<void> {
+  public async start(agent: Agent<any>) {
     this.app.post('/connect', async (req, res) => {
       this.logger.info('SocketDockInboundTransport.connect')
       const sendUrl = req.body.meta.send
