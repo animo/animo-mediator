@@ -1,11 +1,9 @@
 import { AskarModule, AskarMultiWalletDatabaseScheme } from '@credo-ts/askar'
 import {
   Agent,
-  CacheModule,
   ConnectionsModule,
   DidCommMimeType,
   HttpOutboundTransport,
-  InMemoryLruCache,
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
@@ -113,7 +111,7 @@ export async function createAgent() {
     agent.registerInboundTransport(wsInboundTransport)
     agent.registerOutboundTransport(wsOutboundTransport)
   } else {
-    agent.registerInboundTransport(new SocketDockInboundTransport(app, logger))
+    agent.registerInboundTransport(new SocketDockInboundTransport({ app }))
   }
 
   // Added health check endpoint
@@ -139,7 +137,7 @@ export async function createAgent() {
     return res.send(outOfBandRecord.outOfBandInvitation.toJSON())
   })
 
-  httpInboundTransport.app.use(express.json())
+  //  app.use(express.json())
 
   await agent.initialize()
 

@@ -16,9 +16,7 @@ void connect({
   // eslint-disable-next-line no-console
   console.log('Got ngrok url:', app.url())
   const url = app.url()
-
   process.env.NODE_ENV = 'development'
-  process.env.USE_SOCKETDOCK = 'false'
   process.env.AGENT_PORT = `${port}`
   process.env.AGENT_ENDPOINTS = `${url},${url?.replace('http', 'ws')}`
   process.env.SHORTENER_BASE_URL = `${url}/s`
