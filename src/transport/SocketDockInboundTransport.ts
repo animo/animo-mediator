@@ -44,14 +44,14 @@ export class SocketDockInboundTransport implements InboundTransport {
 
       try {
         const socketId = this.activeConnections[connectionId]
-        agent.config.logger.debug(`activeConnections transport session : ${ socketId} ${connectionId}`)
+        agent.config.logger.debug(`activeConnections transport session : ${socketId} ${connectionId}`)
         const sendUrl = req.body.meta.send
         const requestMimeType = req.headers['content-type'] as string
         const session = new SocketDockTransportSession(socketId, res, sendUrl, requestMimeType)
         const message = req.body.message
         const encryptedMessage = JSON.parse(message)
 
-        agent.config.logger.debug(`Session value for transport session : ${ session.id}`)
+        agent.config.logger.debug(`Session value for transport session : ${session.id}`)
 
         agent.events.emit<AgentMessageReceivedEvent>(agent.context, {
           type: AgentEventTypes.AgentMessageReceived,
@@ -70,7 +70,7 @@ export class SocketDockInboundTransport implements InboundTransport {
     this.app.post('/disconnect', async (req, res) => {
       agent.config.logger.info('SocketDockInboundTransport.disconnect')
       const transportService = agent.dependencyManager.resolve(TransportService)
-      const { connection_id } = req.body      
+      const { connection_id } = req.body
       if (!connection_id) {
         throw new Error('ConnectionId is not sent from socketDock server')
       }
@@ -78,7 +78,7 @@ export class SocketDockInboundTransport implements InboundTransport {
       delete this.activeConnections[connection_id]
       const session = transportService.findSessionById(connection_id)
       agent.config.logger.debug(`Got session from transportService ${session?.id}`)
-      if(session) {
+      if (session) {
         transportService.removeSession(session)
       }
 
