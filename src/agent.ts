@@ -137,8 +137,6 @@ export async function createAgent() {
     return res.send(outOfBandRecord.outOfBandInvitation.toJSON())
   })
 
-  //  app.use(express.json())
-
   await agent.initialize()
 
   // When an 'upgrade' to WS is made on our http server, we forward the

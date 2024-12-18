@@ -82,8 +82,8 @@ export class SocketDockInboundTransport implements InboundTransport {
         transportService.removeSession(session)
       }
 
-      agent.config.logger.debug(`removed connection with socketId : ${connection_id}`)
-      res.status(200).send(`connection with socketId : ${connection_id} removed successfully`)
+      agent.config.logger.debug(`removed mapping of socketId : ${connection_id}`)
+      res.status(200).send(`Mapping with socketId : ${connection_id} removed successfully`)
     })
   }
 
