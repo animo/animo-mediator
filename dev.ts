@@ -12,7 +12,7 @@ const port = 3000
 // TODO: have to add auth token now to use ngrok check this later
 void connect({
   port,
-  authtoken: '2TkNMfvaGeeU7o4xNy8aBGPWQOg_kFxWtNs8DsZowhFYfETY',
+  authtoken: process.env.NGROK_AUTH_TOKEN,
 }).then((app) => {
   // eslint-disable-next-line no-console
   console.log('Got ngrok url:', app.url())
