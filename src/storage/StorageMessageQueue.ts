@@ -18,23 +18,16 @@ import fetch from 'node-fetch'
 export interface NotificationMessage {
   messageType: string
   token: string
-  clientCode: string
 }
 
 @injectable()
 export class StorageServiceMessageQueue implements MessagePickupRepository {
   private messageRepository: MessageRepository
   private agentContext: AgentContext
-  private pushNotificationsFcmRepository: PushNotificationsFcmRepository
 
-  public constructor(
-    messageRepository: MessageRepository,
-    agentContext: AgentContext,
-    pushNotificationsFcmRepository: PushNotificationsFcmRepository
-  ) {
+  public constructor(messageRepository: MessageRepository, agentContext: AgentContext) {
     this.messageRepository = messageRepository
     this.agentContext = agentContext
-    this.pushNotificationsFcmRepository = pushNotificationsFcmRepository
   }
 
   public async getAvailableMessageCount(options: GetAvailableMessageCountOptions) {
@@ -114,8 +107,10 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
 
   private async sendNotification(agentContext: AgentContext, connectionId: string, messageType?: string) {
     try {
+      const pushNotificationsFcmRepository = agentContext.dependencyManager.resolve(PushNotificationsFcmRepository)
+
       // Get the device token for the connection
-      const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
+      const pushNotificationFcmRecord = await pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
         connectionId,
       })
 
@@ -127,8 +122,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       // Prepare a message to be sent to the device
       const message: NotificationMessage = {
         messageType: messageType || 'default',
-        token: pushNotificationFcmRecord?.deviceToken || '',
-        clientCode: pushNotificationFcmRecord?.clientCode || '',
+        token: pushNotificationFcmRecord?.deviceToken,
       }
 
       this.agentContext.config.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)
@@ -144,9 +138,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
   private async processNotification(message: NotificationMessage) {
     try {
       const body = {
-        fcmToken: message.token || 'abc',
+        fcmToken: message.token,
         messageType: message.messageType,
-        clientCode: message.clientCode || '5b4d6bc6-362e-4f53-bdad-ee2742bc0de3',
       }
       const requestOptions = {
         method: 'POST',

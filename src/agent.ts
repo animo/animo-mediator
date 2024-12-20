@@ -1,11 +1,9 @@
 import { AskarModule, AskarMultiWalletDatabaseScheme } from '@credo-ts/askar'
 import {
   Agent,
-  CacheModule,
   ConnectionsModule,
   DidCommMimeType,
   HttpOutboundTransport,
-  InMemoryLruCache,
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
