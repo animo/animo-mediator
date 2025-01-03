@@ -1,4 +1,4 @@
-import type { AskarWalletPostgresStorageConfig } from '@aries-framework/askar/build/wallet'
+import type { AskarWalletPostgresStorageConfig } from '@credo-ts/askar/build/wallet'
 
 import { POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST } from './constants'
 

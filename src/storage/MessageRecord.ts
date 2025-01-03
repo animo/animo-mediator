@@ -1,6 +1,6 @@
-import type { EncryptedMessage } from '@aries-framework/core'
+import type { EncryptedMessage } from '@credo-ts/core'
 
-import { BaseRecord, utils } from '@aries-framework/core'
+import { BaseRecord, utils } from '@credo-ts/core'
 
 export type DefaultMessageRecordTags = {
   connectionId: string
