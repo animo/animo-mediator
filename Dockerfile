@@ -1,64 +1,43 @@
-FROM ubuntu:20.04 as base
+FROM node:20 as base
 
-ENV DEBIAN_FRONTEND noninteractive
+workdir /app
 
-RUN apt-get update -y && apt-get install -y \
-  apt-transport-https \
-  curl \
-  make \
-  gcc \
-  g++
-
-# nodejs
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash
-
-# install depdencies and enable corepack
-RUN apt-get update -y && apt-get install -y --allow-unauthenticated nodejs
 RUN corepack enable
-
-# Set cache dir so it can be shared between different docker stages
-RUN yarn config set cache-folder /tmp/yarn-cache
 
 FROM base as setup
 
-# AFJ specifc setup
-WORKDIR /www
-
 # Copy root package files
-COPY package.json /www/package.json
-COPY yarn.lock /www/yarn.lock
-
-# Copy patches folder
-COPY patches /www/patches
+COPY package.json /app/package.json
+COPY pnpm-lock.yaml /app/pnpm-lock.yaml
+COPY patches /app/patches
 
 # Run yarn install
-RUN yarn install
+RUN pnpm install
 
-COPY tsconfig.build.json /www/tsconfig.build.json
-COPY . /www
+COPY . /app
 
-RUN yarn build
+RUN pnpm build
 
 FROM base as final
 
-WORKDIR /www
+WORKDIR /app
 
-COPY --from=setup /www/build /www/build
-COPY --from=setup /tmp/yarn-cache /tmp/yarn-cache
+# Copy build
+COPY --from=setup /app/build /app/build
 
-# Copy root package files and mediator app package
-COPY package.json /www/package.json
-COPY yarn.lock /www/yarn.lock
-
-# Copy patches folder
-COPY patches /www/patches
-
-WORKDIR /www
+COPY package.json /app/package.json
+COPY pnpm-lock.yaml /app/pnpm-lock.yaml
+COPY patches /app/patches
 
 # Run yarn install
-RUN yarn install --production
+RUN pnpm install --production
 
 # Clean cache to reduce image size
-RUN yarn cache clean
+RUN pnpm store prune
 
-ENTRYPOINT [ "yarn", "start" ]
+# Don't run production as root
+RUN addgroup --system --gid 1001 agent
+RUN adduser --system --uid 1001 agent
+USER agent
+
+ENTRYPOINT [ "node", "build/index.js" ]

@@ -1,11 +1,9 @@
 import { LogLevel } from '@credo-ts/core'
-import * as dotenv from 'dotenv'
-dotenv.config()
 
 export const AGENT_PORT = process.env.AGENT_PORT ? Number(process.env.AGENT_PORT) : 3000
-export const AGENT_NAME = process.env.AGENT_NAME || 'CREDEBL Mediator'
-export const WALLET_NAME = process.env.WALLET_NAME || 'credebl-mediator-dev'
-export const WALLET_KEY = process.env.WALLET_KEY || 'credebl-mediator-dev'
+export const AGENT_NAME = process.env.AGENT_NAME || 'Credo Mediator'
+export const WALLET_NAME = process.env.WALLET_NAME || 'credo-mediator-dev'
+export const WALLET_KEY = process.env.WALLET_KEY || 'credo-mediator-dev'
 export const AGENT_ENDPOINTS = process.env.AGENT_ENDPOINTS?.split(',') ?? [
   `http://localhost:${AGENT_PORT}`,
   `ws://localhost:${AGENT_PORT}`,

@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { LogLevel, BaseLogger } from '@credo-ts/core'
+import { BaseLogger, LogLevel } from '@credo-ts/core'
 import { Logger as TSLogger } from 'tslog'
 
 import { replaceError } from './replaceError'
@@ -24,11 +22,12 @@ export class Logger extends BaseLogger {
 
     this.logger = new TSLogger({
       name: 'Mediator Agent',
-      minLevel: this.logLevel == LogLevel.off ? 'fatal' : this.tsLogLevelMap[this.logLevel],
+      minLevel: this.logLevel === LogLevel.off ? 'fatal' : this.tsLogLevelMap[this.logLevel],
       ignoreStackLevels: 5,
     })
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   private log(level: Exclude<LogLevel, LogLevel.off>, message: string, data?: Record<string, any>): void {
     const tsLogLevel = this.tsLogLevelMap[level]
 
@@ -41,30 +40,37 @@ export class Logger extends BaseLogger {
     }
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public test(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.test, message, data)
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public trace(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.trace, message, data)
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public debug(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.debug, message, data)
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public info(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.info, message, data)
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public warn(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.warn, message, data)
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public error(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.error, message, data)
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public fatal(message: string, data?: Record<string, any>): void {
     this.log(LogLevel.fatal, message, data)
   }

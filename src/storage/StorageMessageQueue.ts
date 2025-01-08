@@ -1,19 +1,18 @@
 import type {
   AddMessageOptions,
   GetAvailableMessageCountOptions,
+  MessagePickupRepository,
   QueuedMessage,
   RemoveMessagesOptions,
   TakeFromQueueOptions,
-  MessagePickupRepository,
 } from '@credo-ts/core'
 
-import { injectable, AgentContext, utils } from '@credo-ts/core'
+import { type AgentContext, injectable, utils } from '@credo-ts/core'
 
-import { MessageRecord } from './MessageRecord'
-import { MessageRepository } from './MessageRepository'
-import { PushNotificationsFcmRepository } from '../push-notifications/fcm/repository'
 import { NOTIFICATION_WEBHOOK_URL, USE_PUSH_NOTIFICATIONS } from '../constants'
-import fetch from 'node-fetch'
+import { PushNotificationsFcmRepository } from '../push-notifications/fcm/repository'
+import { MessageRecord } from './MessageRecord'
+import type { MessageRepository } from './MessageRepository'
 
 export interface NotificationMessage {
   messageType: string
@@ -115,7 +114,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       })
 
       if (!pushNotificationFcmRecord?.deviceToken) {
-        this.agentContext.config.logger.info(`No device token found for connectionId so skip sending notification`)
+        this.agentContext.config.logger.info('No device token found for connectionId so skip sending notification')
         return
       }
 
@@ -129,7 +128,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       await this.processNotification(message)
       this.agentContext.config.logger.info(`Notification sent successfully to ${connectionId}`)
     } catch (error) {
-      this.agentContext.config.logger.error(`Error sending notification`, {
+      this.agentContext.config.logger.error('Error sending notification', {
         cause: error,
       })
     }
@@ -152,14 +151,14 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       const response = await fetch(NOTIFICATION_WEBHOOK_URL, requestOptions)
 
       if (response.ok) {
-        this.agentContext.config.logger.info(`Notification sent successfully`)
+        this.agentContext.config.logger.info('Notification sent successfully')
       } else {
-        this.agentContext.config.logger.error(`Error sending notification`, {
+        this.agentContext.config.logger.error('Error sending notification', {
           cause: response.statusText,
         })
       }
     } catch (error) {
-      this.agentContext.config.logger.error(`Error sending notification`, {
+      this.agentContext.config.logger.error('Error sending notification', {
         cause: error,
       })
     }

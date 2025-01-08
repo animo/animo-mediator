@@ -1,3 +1,4 @@
+import type { Socket } from 'node:net'
 import { AskarModule, AskarMultiWalletDatabaseScheme } from '@credo-ts/askar'
 import {
   Agent,
@@ -7,12 +8,11 @@ import {
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
-  WalletConfig,
+  type WalletConfig,
   WsOutboundTransport,
 } from '@credo-ts/core'
 import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@credo-ts/node'
 import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
-import type { Socket } from 'net'
 
 import express from 'express'
 import { Server } from 'ws'
@@ -20,8 +20,8 @@ import { Server } from 'ws'
 import { AGENT_ENDPOINTS, AGENT_NAME, AGENT_PORT, LOG_LEVEL, POSTGRES_HOST, WALLET_KEY, WALLET_NAME } from './constants'
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
-import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
+import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 
 function createModules() {
   const modules = {
@@ -104,7 +104,6 @@ export async function createAgent() {
     res.status(200).send('Ok')
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   httpInboundTransport.app.get('/invite', async (req, res) => {
     if (!req.query._oobid || typeof req.query._oobid !== 'string') {
       return res.status(400).send('Missing or invalid _oobid')

@@ -1,11 +1,11 @@
 import {
-  AgentContext,
-  EventEmitter,
-  inject,
-  injectable,
+  type AgentContext,
+  type EventEmitter,
   InjectionSymbols,
   Repository,
-  StorageService,
+  type StorageService,
+  inject,
+  injectable,
 } from '@credo-ts/core'
 
 import { MessageRecord } from './MessageRecord'

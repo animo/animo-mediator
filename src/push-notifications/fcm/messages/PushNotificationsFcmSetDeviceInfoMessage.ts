@@ -26,7 +26,7 @@ export class PushNotificationsFcmSetDeviceInfoMessage extends AgentMessage {
 
   @Expose({ name: 'device_token' })
   @IsString()
-  @ValidateIf((object, value) => value !== null)
+  @ValidateIf((_, value) => value !== null)
   public deviceToken!: string | null
 
   @Expose({ name: 'device_platform' })
