@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { LogLevel, BaseLogger } from '@aries-framework/core'
+import { LogLevel, BaseLogger } from '@credo-ts/core'
 import { Logger as TSLogger } from 'tslog'
 
 import { replaceError } from './replaceError'
@@ -23,7 +23,7 @@ export class Logger extends BaseLogger {
     super(logLevel)
 
     this.logger = new TSLogger({
-      name: 'DIDComm Chat',
+      name: 'Mediator Agent',
       minLevel: this.logLevel == LogLevel.off ? 'fatal' : this.tsLogLevelMap[this.logLevel],
       ignoreStackLevels: 5,
     })
