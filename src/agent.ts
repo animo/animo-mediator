@@ -105,7 +105,7 @@ export async function createAgent() {
   agent.registerInboundTransport(httpInboundTransport)
   agent.registerOutboundTransport(httpOutboundTransport)
 
-  if (USE_SOCKETDOCK === 'false') {
+  if (!USE_SOCKETDOCK) {
     const wsInboundTransport = new WsInboundTransport({ server: socketServer })
     const wsOutboundTransport = new WsOutboundTransport()
     agent.registerInboundTransport(wsInboundTransport)

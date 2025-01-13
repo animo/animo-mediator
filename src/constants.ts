@@ -17,7 +17,7 @@ export const POSTGRES_ADMIN_PASSWORD = process.env.POSTGRES_ADMIN_PASSWORD
 
 export const INVITATION_URL = process.env.INVITATION_URL
 
-export const USE_SOCKETDOCK = process.env.USE_SOCKETDOCK || 'false'
+export const USE_SOCKETDOCK = process.env.USE_SOCKETDOCK === 'true'
 
 export const LOG_LEVEL = LogLevel.debug
 
