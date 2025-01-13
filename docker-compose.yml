@@ -1,8 +1,9 @@
-version: '3.5'
+version: "3.5"
 
 services:
-  animomediator:
-    image: ghcr.io/animo/animo-mediator:latest
+  # TODO: add postgres service as example
+  mediator:
+    image: ghcr.io/openwallet-foundation/didcomm-mediator-credo:latest
     environment:
       AGENT_PORT: 3000
       AGENT_NAME: Mediator
@@ -13,7 +14,7 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_ADMIN_USER: ${POSTGRES_ADMIN_USER}
       POSTGRES_ADMIN_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-      AGENT_ENDPOINTS: 'https://my-mediator.com,wss://my-mediator.com'
+      AGENT_ENDPOINTS: "https://my-mediator.com,wss://my-mediator.com"
       LOG_LEVEL: 2
     ports:
-      - '3000'
+      - "3000"
