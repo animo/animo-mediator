@@ -1,7 +1,13 @@
+import {
+  type Agent,
+  AgentEventTypes,
+  type AgentMessageReceivedEvent,
+  type InboundTransport,
+  TransportService,
+} from '@credo-ts/core'
 import type { Express } from 'express'
-import { Agent, AgentEventTypes, AgentMessageReceivedEvent, InboundTransport, TransportService } from '@credo-ts/core'
-import { SocketDockTransportSession } from './SocketDockTransportSession'
 import express from 'express'
+import { SocketDockTransportSession } from './SocketDockTransportSession'
 
 export class SocketDockInboundTransport implements InboundTransport {
   private app: Express

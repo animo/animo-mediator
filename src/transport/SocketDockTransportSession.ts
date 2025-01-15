@@ -1,8 +1,7 @@
-import { AgentContext, DidCommMimeType, EncryptedMessage, TransportSession } from '@credo-ts/core'
-import type { Response } from 'express'
+import { type AgentContext, DidCommMimeType, type EncryptedMessage, type TransportSession } from '@credo-ts/core'
 import { CredoError } from '@credo-ts/core'
-
 import { agentDependencies } from '@credo-ts/node'
+import type { Response } from 'express'
 
 export const supportedContentTypes: string[] = [DidCommMimeType.V0, DidCommMimeType.V1]
 
@@ -11,7 +10,7 @@ export class SocketDockTransportSession implements TransportSession {
   public readonly type = 'socketdock'
   public res: Response
   public sendUrl: string
-  public requestMimeType: any
+  public requestMimeType: string
 
   public constructor(id: string, res: Response, sendUrl: string, requestMimeType: string) {
     this.id = id
