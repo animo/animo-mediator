@@ -10,9 +10,9 @@ export class SocketDockTransportSession implements TransportSession {
   public readonly type = 'socketdock'
   public res: Response
   public sendUrl: string
-  public requestMimeType: string
+  public requestMimeType: DidCommMimeType
 
-  public constructor(id: string, res: Response, sendUrl: string, requestMimeType: string) {
+  public constructor(id: string, res: Response, sendUrl: string, requestMimeType: DidCommMimeType) {
     this.id = id
     this.res = res
     this.sendUrl = sendUrl

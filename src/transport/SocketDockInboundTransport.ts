@@ -2,6 +2,7 @@ import {
   type Agent,
   AgentEventTypes,
   type AgentMessageReceivedEvent,
+  type DidCommMimeType,
   type InboundTransport,
   TransportService,
 } from '@credo-ts/core'
@@ -52,7 +53,7 @@ export class SocketDockInboundTransport implements InboundTransport {
         const socketId = this.activeConnections[connectionId]
         agent.config.logger.debug(`activeConnections transport session : ${socketId} ${connectionId}`)
         const sendUrl = req.body.meta.send
-        const requestMimeType = req.headers['content-type'] as string
+        const requestMimeType = req.headers['content-type'] as DidCommMimeType
         const session = new SocketDockTransportSession(socketId, res, sendUrl, requestMimeType)
         const message = req.body.message
         const encryptedMessage = JSON.parse(message)
