@@ -1,0 +1,64 @@
+version: '3.9'
+
+networks:
+  local_network:
+    name: local_network
+volumes:
+  postgres-data:
+
+services:
+  # redis-1:
+  #   image: redis:7.2.3-alpine
+  #   command: redis-server --appendonly yes --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --port 6379
+  #   environment:
+  #     - 'IP=0.0.0.0'
+  #   networks:
+  #     - local_network
+  #   ports:
+  #     - '6379:6379'
+
+  # redis-2:
+  #   image: redis:7.2.3-alpine
+  #   command: redis-server --appendonly yes --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --port 6379
+  #   environment:
+  #     - 'IP=0.0.0.0'
+  #   networks:
+  #     - local_network
+  #   ports:
+  #     - '6380:6379'
+
+  # redis-3:
+  #   image: redis:7.2.3-alpine
+  #   command: redis-server --appendonly yes --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --port 6379
+  #   environment:
+  #     - 'IP=0.0.0.0'
+  #   networks:
+  #     - local_network
+  #   ports:
+  #     - '6381:6379'
+
+  postgres:
+    image: postgres:13
+    env_file:
+      - ../.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - local_network
+
+  mediator:
+    image: mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye
+    working_dir: /work
+    volumes:
+      - ../:/work
+      - /work/node_modules
+    ports:
+      - '3110:3110'
+    tty: true
+    networks:
+      - local_network
+    env_file:
+      - ../.env
+    environment:
+      # - REDIS_URI=redis://redis-1:6379/0
+      - POSTGRES_HOST=postgres
