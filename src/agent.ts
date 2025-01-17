@@ -106,7 +106,6 @@ export async function createAgent() {
     res.status(200).send('Ok')
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   httpInboundTransport.app.get('/invite', async (req, res) => {
     if (!req.query._oobid || typeof req.query._oobid !== 'string') {
       return res.status(400).send('Missing or invalid _oobid')

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { LogLevel, BaseLogger } from '@credo-ts/core'
 import { Logger as TSLogger } from 'tslog'
 

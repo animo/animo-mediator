@@ -1,10 +1,8 @@
 import dotenv from 'dotenv';
 import nconf from 'nconf';
 import path from 'path';
-// import { fileURLToPath } from 'url';
 import { LogLevel } from '@credo-ts/core'
 
-// const dirName = path.dirname(fileURLToPath(import.meta.url));
 const dirName = __dirname;
 const configFileName = 'config.json';
 const env = process.env.NODE_ENV ?? 'development';
@@ -29,7 +27,6 @@ nconf.overrides({
     password: process.env.POSTGRES_PASSWORD,
     adminUser: process.env.POSTGRES_ADMIN_USER,
     adminPassword: process.env.POSTGRES_ADMIN_PASSWORD,
-    // database: process.env.POSTGRES_DATABSE,
   },
   agent: {
     port: agentPort,
@@ -48,16 +45,11 @@ nconf.overrides({
 
 // load other properties from file.
 nconf
-  .argv()
+  .argv({ parseValues: true })
   .env()
   .file({ file: path.join(dirName, '../', configFileName) });
 
 // if nothing else is set, use defaults. This will be set
 // if they do not exist in overrides or the config file.
-// nconf.defaults({});
-
-if (env === 'development') {
-  console.log('Configuration:', nconf.get());
-}
 
 export default nconf;
