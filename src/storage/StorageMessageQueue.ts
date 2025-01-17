@@ -12,7 +12,7 @@ import { injectable, AgentContext, utils } from '@credo-ts/core'
 import { MessageRecord } from './MessageRecord'
 import { MessageRepository } from './MessageRepository'
 import { PushNotificationsFcmRepository } from '../push-notifications/fcm/repository'
-import fetch from 'node-fetch'
+
 import config from '../config'
 
 export interface NotificationMessage {
