@@ -1,14 +1,14 @@
-import dotenv from 'dotenv';
-import nconf from 'nconf';
-import path from 'path';
+import path from 'node:path'
 import { LogLevel } from '@credo-ts/core'
+import dotenv from 'dotenv'
+import nconf from 'nconf'
 
-const dirName = __dirname;
-const configFileName = 'config.json';
-const env = process.env.NODE_ENV ?? 'development';
+const dirName = __dirname
+const configFileName = 'config.json'
+const env = process.env.NODE_ENV ?? 'development'
 
 if (env === 'development') {
-  dotenv.config();
+  dotenv.config()
 }
 
 /**
@@ -17,7 +17,7 @@ if (env === 'development') {
  * and added to the config.
  */
 
-const agentPort = Number(process.env.AGENT_PORT ?? 3110) ;
+const agentPort = Number(process.env.AGENT_PORT ?? 3110)
 
 // overrides are always as defined
 nconf.overrides({
@@ -30,7 +30,9 @@ nconf.overrides({
   },
   agent: {
     port: agentPort,
-    endpoints: process.env.AGENT_ENDPOINTS ? process.env.AGENT_ENDPOINTS.split(',') : [ `http://localhost:${agentPort}`, `ws://localhost:${agentPort}`],
+    endpoints: process.env.AGENT_ENDPOINTS
+      ? process.env.AGENT_ENDPOINTS.split(',')
+      : [`http://localhost:${agentPort}`, `ws://localhost:${agentPort}`],
     name: process.env.AGENT_NAME ?? 'My Mediator',
     invitationUrl: process.env.INVITATION_URL,
     logLevel: process.env.LOG_LEVEL ?? LogLevel.debug,
@@ -40,16 +42,16 @@ nconf.overrides({
   wallet: {
     name: process.env.WALLET_NAME ?? 'mediator-dev',
     key: process.env.WALLET_KEY ?? 'blarbzzz',
-  }
-});
+  },
+})
 
 // load other properties from file.
 nconf
   .argv({ parseValues: true })
   .env()
-  .file({ file: path.join(dirName, '../', configFileName) });
+  .file({ file: path.join(dirName, '../', configFileName) })
 
 // if nothing else is set, use defaults. This will be set
 // if they do not exist in overrides or the config file.
 
-export default nconf;
+export default nconf

@@ -1,6 +1,6 @@
 import type { TagsBase } from '@credo-ts/core'
 
-import { utils, BaseRecord } from '@credo-ts/core'
+import { BaseRecord, utils } from '@credo-ts/core'
 
 export type DefaultPushNotificationsFcmTags = {
   connectionId: string

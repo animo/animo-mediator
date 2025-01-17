@@ -1,17 +1,17 @@
 import type {
   AddMessageOptions,
   GetAvailableMessageCountOptions,
+  MessagePickupRepository,
   QueuedMessage,
   RemoveMessagesOptions,
   TakeFromQueueOptions,
-  MessagePickupRepository,
 } from '@credo-ts/core'
 
-import { injectable, AgentContext, utils } from '@credo-ts/core'
+import { AgentContext, injectable, utils } from '@credo-ts/core'
 
+import { PushNotificationsFcmRepository } from '../push-notifications/fcm/repository'
 import { MessageRecord } from './MessageRecord'
 import { MessageRepository } from './MessageRepository'
-import { PushNotificationsFcmRepository } from '../push-notifications/fcm/repository'
 
 import config from '../config'
 
@@ -92,8 +92,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
     )
 
     // Send a notification to the device
-    if (config.get("agent:usePushNotifications") && config.get("agent:notificationWebhookUrl") ) {
-      await this.sendNotification(this.agentContext, connectionId, "messageType")
+    if (config.get('agent:usePushNotifications') && config.get('agent:notificationWebhookUrl')) {
+      await this.sendNotification(this.agentContext, connectionId, 'messageType')
     }
 
     return id
@@ -119,7 +119,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       })
 
       if (!pushNotificationFcmRecord?.deviceToken) {
-        this.agentContext.config.logger.info(`No device token found for connectionId so skip sending notification`)
+        this.agentContext.config.logger.info('No device token found for connectionId so skip sending notification')
         return
       }
 
@@ -133,7 +133,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       await this.processNotification(message)
       this.agentContext.config.logger.info(`Notification sent successfully to ${connectionId}`)
     } catch (error) {
-      this.agentContext.config.logger.error(`Error sending notification`, {
+      this.agentContext.config.logger.error('Error sending notification', {
         cause: error,
       })
     }
@@ -153,17 +153,17 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
         body: JSON.stringify(body),
       }
 
-      const response = await fetch(config.get("agent:notificationWebhookUrl"), requestOptions)
+      const response = await fetch(config.get('agent:notificationWebhookUrl'), requestOptions)
 
       if (response.ok) {
-        this.agentContext.config.logger.info(`Notification sent successfully`)
+        this.agentContext.config.logger.info('Notification sent successfully')
       } else {
-        this.agentContext.config.logger.error(`Error sending notification`, {
+        this.agentContext.config.logger.error('Error sending notification', {
           cause: response.statusText,
         })
       }
     } catch (error) {
-      this.agentContext.config.logger.error(`Error sending notification`, {
+      this.agentContext.config.logger.error('Error sending notification', {
         cause: error,
       })
     }

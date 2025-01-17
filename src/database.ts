@@ -6,13 +6,13 @@ export const askarPostgresConfig: AskarWalletPostgresStorageConfig = {
   // for the Postgres plugin configuration.
   type: 'postgres',
   config: {
-    host: config.get("db:host") as string,
+    host: config.get('db:host') as string,
     connectTimeout: 10,
   },
   credentials: {
-    account: config.get("db:user") as string,
-    password: config.get("db:password") as string,
-    adminAccount: config.get("db:adminUser") as string,
-    adminPassword: config.get("db:adminPassword") as string,
+    account: config.get('db:user') as string,
+    password: config.get('db:password') as string,
+    adminAccount: config.get('db:adminUser') as string,
+    adminPassword: config.get('db:adminPassword') as string,
   },
 }

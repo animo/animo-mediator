@@ -1,10 +1,10 @@
-import type { FcmDeviceInfo } from '../models/FcmDeviceInfo'
 import type { InboundMessageContext, Logger } from '@credo-ts/core'
+import type { FcmDeviceInfo } from '../models/FcmDeviceInfo'
 
-import { CredoError, inject, InjectionSymbols, injectable, TransportService } from '@credo-ts/core'
+import { CredoError, InjectionSymbols, TransportService, inject, injectable } from '@credo-ts/core'
 
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
-import { PushNotificationsFcmSetDeviceInfoMessage, PushNotificationsFcmDeviceInfoMessage } from '../messages'
+import { PushNotificationsFcmDeviceInfoMessage, PushNotificationsFcmSetDeviceInfoMessage } from '../messages'
 import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../repository'
 
 @injectable()

@@ -3,9 +3,9 @@ import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
 import { Protocol } from '@credo-ts/core'
 
 import { PushNotificationsFcmApi } from './PushNotificationsFcmApi'
-import { PushNotificationsFcmService } from './services/PushNotificationsFcmService'
 import { PushNotificationsFcmRole } from './models'
 import { PushNotificationsFcmRepository } from './repository'
+import { PushNotificationsFcmService } from './services/PushNotificationsFcmService'
 
 /**
  * Module that exposes push notification get and set functionality

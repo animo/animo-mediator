@@ -1,29 +1,27 @@
+import type { Socket } from 'node:net'
 import { AskarModule, AskarMultiWalletDatabaseScheme } from '@credo-ts/askar'
 import {
   Agent,
-  CacheModule,
   ConnectionsModule,
   DidCommMimeType,
   HttpOutboundTransport,
-  InMemoryLruCache,
   MediatorModule,
   OutOfBandRole,
   OutOfBandState,
-  WalletConfig,
+  type WalletConfig,
   WsOutboundTransport,
 } from '@credo-ts/core'
 import { HttpInboundTransport, WsInboundTransport, agentDependencies } from '@credo-ts/node'
 import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
-import type { Socket } from 'net'
 
 import express from 'express'
 import { Server } from 'ws'
 
+import config from './config'
 import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
-import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
-import config from './config'
+import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 
 function createModules() {
   const modules = {
@@ -53,11 +51,11 @@ export async function createAgent() {
   const logger = new Logger(config.get('agent:logLevel'))
 
   // Only load postgres database in production
-  const storageConfig = config.get("db:host") ? askarPostgresConfig : undefined
+  const storageConfig = config.get('db:host') ? askarPostgresConfig : undefined
 
   const walletConfig: WalletConfig = {
-    id: config.get("wallet:name"),
-    key: config.get("wallet:key"),
+    id: config.get('wallet:name'),
+    key: config.get('wallet:key'),
     storage: storageConfig,
   }
 
@@ -74,8 +72,8 @@ export async function createAgent() {
 
   const agent = new Agent({
     config: {
-      label: config.get("agent:name"),
-      endpoints: config.get("agent:endpoints"),
+      label: config.get('agent:name'),
+      endpoints: config.get('agent:endpoints'),
       walletConfig: walletConfig,
       useDidSovPrefixWhereAllowed: true,
       logger: logger,
@@ -90,7 +88,7 @@ export async function createAgent() {
   })
 
   // Create all transports
-  const httpInboundTransport = new HttpInboundTransport({ app, port: config.get("agent:port") })
+  const httpInboundTransport = new HttpInboundTransport({ app, port: config.get('agent:port') })
   const httpOutboundTransport = new HttpOutboundTransport()
   const wsInboundTransport = new WsInboundTransport({ server: socketServer })
   const wsOutboundTransport = new WsOutboundTransport()
@@ -127,15 +125,15 @@ export async function createAgent() {
   await agent.initialize()
 
   httpInboundTransport.server?.on('listening', () => {
-    logger.info(`Agent listening on port ${config.get("agent:port")}`)
+    logger.info(`Agent listening on port ${config.get('agent:port')}`)
   })
 
   httpInboundTransport.server?.on('error', (err) => {
-    logger.error(`Agent failed to start on port ${config.get("agent:port")}`, err)
+    logger.error(`Agent failed to start on port ${config.get('agent:port')}`, err)
   })
 
   httpInboundTransport.server?.on('close', () => {
-    logger.info(`Agent stopped listening on port ${config.get("agent:port")}`)
+    logger.info(`Agent stopped listening on port ${config.get('agent:port')}`)
   })
 
   // When an 'upgrade' to WS is made on our http server, we forward the
