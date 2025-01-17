@@ -101,7 +101,7 @@ export async function createAgent() {
 
   // Added health check endpoint
   httpInboundTransport.app.get('/health', async (_req, res) => {
-    res.status(200).send('Ok')
+    res.sendStatus(202)
   })
 
   httpInboundTransport.app.get('/invite', async (req, res) => {
