@@ -24,7 +24,7 @@ export class Logger extends BaseLogger {
 
     this.logger = new TSLogger({
       name: 'Mediator Agent',
-      minLevel: this.logLevel == LogLevel.off ? 'fatal' : this.tsLogLevelMap[this.logLevel],
+      minLevel: this.logLevel === LogLevel.off ? 'fatal' : this.tsLogLevelMap[this.logLevel],
       ignoreStackLevels: 5,
     })
   }
