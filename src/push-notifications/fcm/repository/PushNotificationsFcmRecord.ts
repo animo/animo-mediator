@@ -1,6 +1,6 @@
 import type { TagsBase } from '@credo-ts/core'
 
-import { BaseRecord, utils } from '@credo-ts/core'
+import { utils, BaseRecord } from '@credo-ts/core'
 
 export type DefaultPushNotificationsFcmTags = {
   connectionId: string
@@ -12,6 +12,7 @@ export interface PushNotificationsFcmStorageProps {
   id?: string
   deviceToken: string | null
   devicePlatform: string | null
+  clientCode: string | null
   connectionId: string
   tags?: CustomPushNotificationsFcmTags
 }
@@ -23,6 +24,7 @@ export class PushNotificationsFcmRecord extends BaseRecord<
   public deviceToken!: string | null
   public devicePlatform!: string | null
   public connectionId!: string
+  public clientCode!: string | null
 
   public static readonly type = 'PushNotificationsFcmRecord'
   public readonly type = PushNotificationsFcmRecord.type
@@ -36,6 +38,7 @@ export class PushNotificationsFcmRecord extends BaseRecord<
       this.deviceToken = props.deviceToken
       this.connectionId = props.connectionId
       this._tags = props.tags ?? {}
+      this.clientCode = props.clientCode
     }
   }
 

@@ -1,7 +1,7 @@
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
+import { PushNotificationsFcmService } from '../services/PushNotificationsFcmService'
 import { PushNotificationsFcmSetDeviceInfoMessage } from '../messages'
-import type { PushNotificationsFcmService } from '../services/PushNotificationsFcmService'
 
 /**
  * Handler for incoming push notification device info messages

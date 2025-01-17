@@ -1,9 +1,15 @@
 import { OutOfBandRepository, OutOfBandRole, OutOfBandState } from '@credo-ts/core'
 
 import { createAgent } from './agent'
-import { INVITATION_URL } from './constants'
+import config from './config';
 
+console.log(`AGENT_PORT: ${config.get('agent:port')}`)
+console.log(`AGENT_ENDPOINTS: ${config.get("agent:endpoints")}`)
+
+// const main = async () => {
 void createAgent().then(async (agent) => {
+  // const agent = await createAgent()
+
   agent.config.logger.info('Agent started')
 
   // Try to find existing out of band record
@@ -22,11 +28,22 @@ void createAgent().then(async (agent) => {
     })
   }
 
+  // if () {
+    // outOfBandRecord = await agent.oob.createInvitation({
+    //   multiUseInvitation: true,
+    // })
+  // }
+
   const httpEndpoint = agent.config.endpoints.find((e) => e.startsWith('http')) as string
-  const invitationEndpoint = INVITATION_URL ?? `${httpEndpoint}/invite`
+  const invitationEndpoint = config.get("agent:invitationUrl") ?? `${httpEndpoint}/invite`
   const mediatorInvitationUrlLong = outOfBandRecord.outOfBandInvitation.toUrl({
     domain: invitationEndpoint,
   })
 
   agent.config.logger.info(`Out of band invitation url: \n\n\t${mediatorInvitationUrlLong}`)
 })
+  // }
+
+// main().then(() => {
+//   console.log('done')
+// })

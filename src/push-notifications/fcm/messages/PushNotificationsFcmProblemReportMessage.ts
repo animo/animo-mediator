@@ -1,6 +1,6 @@
 import type { ProblemReportMessageOptions } from '@credo-ts/core'
 
-import { IsValidMessageType, ProblemReportMessage, parseMessageType } from '@credo-ts/core'
+import { IsValidMessageType, parseMessageType, ProblemReportMessage } from '@credo-ts/core'
 
 export type PushNotificationsFcmProblemReportMessageOptions = ProblemReportMessageOptions
 
@@ -9,6 +9,14 @@ export type PushNotificationsFcmProblemReportMessageOptions = ProblemReportMessa
  * @internal
  */
 export class PushNotificationsFcmProblemReportMessage extends ProblemReportMessage {
+  /**
+   * Create new ConnectionProblemReportMessage instance.
+   * @param options
+   */
+  public constructor(options: PushNotificationsFcmProblemReportMessageOptions) {
+    super(options)
+  }
+
   @IsValidMessageType(PushNotificationsFcmProblemReportMessage.type)
   public readonly type = PushNotificationsFcmProblemReportMessage.type.messageTypeUri
   public static readonly type = parseMessageType('https://didcomm.org/push-notifications-fcm/1.0/problem-report')

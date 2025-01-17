@@ -1,4 +1,4 @@
-import { type DependencyManager, InjectionSymbols, type Module } from '@credo-ts/core'
+import { InjectionSymbols, type DependencyManager, type Module } from '@credo-ts/core'
 
 import { StorageServiceMessageQueue } from './StorageMessageQueue'
 

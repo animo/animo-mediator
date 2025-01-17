@@ -1,5 +1,5 @@
-import type { ProblemReportErrorOptions } from '@credo-ts/core'
 import type { PushNotificationsFcmProblemReportReason } from './PushNotificationsFcmProblemReportReason'
+import type { ProblemReportErrorOptions } from '@credo-ts/core'
 
 import { ProblemReportError } from '@credo-ts/core'
 
@@ -18,10 +18,7 @@ interface PushNotificationsFcmProblemReportErrorOptions extends ProblemReportErr
 export class PushNotificationsFcmProblemReportError extends ProblemReportError {
   public problemReport: PushNotificationsFcmProblemReportMessage
 
-  public constructor(
-    public message: string,
-    { problemCode }: PushNotificationsFcmProblemReportErrorOptions
-  ) {
+  public constructor(public message: string, { problemCode }: PushNotificationsFcmProblemReportErrorOptions) {
     super(message, { problemCode })
     this.problemReport = new PushNotificationsFcmProblemReportMessage({
       description: {
