@@ -18,7 +18,6 @@ import config from '../config'
 export interface NotificationMessage {
   messageType: string
   token: string
-  clientCode: string
 }
 
 @injectable()
@@ -128,7 +127,6 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       const message: NotificationMessage = {
         messageType: messageType || 'default',
         token: pushNotificationFcmRecord?.deviceToken || '',
-        clientCode: pushNotificationFcmRecord?.clientCode || '',
       }
 
       this.agentContext.config.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)
@@ -144,9 +142,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
   private async processNotification(message: NotificationMessage) {
     try {
       const body = {
-        fcmToken: message.token || 'abc',
+        fcmToken: message.token,
         messageType: message.messageType,
-        clientCode: message.clientCode || '5b4d6bc6-362e-4f53-bdad-ee2742bc0de3',
       }
       const requestOptions = {
         method: 'POST',

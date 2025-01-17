@@ -35,7 +35,6 @@ export class PushNotificationsFcmService {
       threadId,
       deviceToken: deviceInfo.deviceToken,
       devicePlatform: deviceInfo.devicePlatform,
-      clientCode: deviceInfo.clientCode,
     })
   }
 
@@ -74,7 +73,6 @@ export class PushNotificationsFcmService {
         connectionId: connection.id,
         deviceToken: message.deviceToken,
         devicePlatform: message.devicePlatform,
-        clientCode: message.clientCode,
       })
 
       await this.pushNotificationsFcmRepository.save(agentContext, pushNotificationsFcmRecord)
