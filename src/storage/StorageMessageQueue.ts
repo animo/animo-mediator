@@ -126,7 +126,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       // Prepare a message to be sent to the device
       const message: NotificationMessage = {
         messageType: messageType || 'default',
-        token: pushNotificationFcmRecord?.deviceToken || '',
+        token: pushNotificationFcmRecord?.deviceToken,
       }
 
       this.agentContext.config.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)
