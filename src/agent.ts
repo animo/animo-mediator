@@ -142,9 +142,7 @@ export async function createAgent() {
   // When an 'upgrade' to WS is made on our http server, we forward the
   // request to the WS server
   httpInboundTransport.server?.on('upgrade', (request, socket, head) => {
-    console.log('******* UPGRADE')
     socketServer.handleUpgrade(request, socket as Socket, head, (socket) => {
-      console.log('******* CONNECTION')
       socketServer.emit('connection', socket, request)
     })
   })
