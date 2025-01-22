@@ -13,7 +13,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["github.copilot", "github.copilot-chat", "ms-azuretools.vscode-docker"]
+      "extensions": ["ms-azuretools.vscode-docker"]
     }
   }
 }
