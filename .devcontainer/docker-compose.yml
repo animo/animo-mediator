@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 
 networks:
   local_credo_mediator_network:
-    name: local_network
+    name: local_credo_mediator_network
 volumes:
   postgres-data:
 
@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - local_network
+      - local_credo_mediator_network
 
   mediator:
     image: mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye
@@ -24,10 +24,10 @@ services:
       - ../:/work
       - /work/node_modules
     ports:
-      - '3110:3110'
+      - "3110:3110"
     tty: true
     networks:
-      - local_network
+      - local_credo_mediator_network
     env_file:
       - ../.env
     environment:
