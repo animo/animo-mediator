@@ -22,6 +22,8 @@ import { askarPostgresConfig } from './database'
 import { Logger } from './logger'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
+import { initializeApp } from 'firebase-admin/app'
+import { credential } from 'firebase-admin'
 
 function createModules() {
   const modules = {
@@ -143,6 +145,17 @@ export async function createAgent() {
       socketServer.emit('connection', socket, request)
     })
   })
+
+  if (process.env.USE_PUSH_NOTIFICATIONS) {
+    initializeApp({
+      credential:
+        credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY,
+        })
+    })
+  }
 
   return agent
 }
