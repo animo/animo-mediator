@@ -1,12 +1,18 @@
-import type { InboundMessageContext, Logger } from '@credo-ts/core'
+import type { AgentContext, InboundMessageContext, Logger } from '@credo-ts/core'
 import type { FcmDeviceInfo } from '../models/FcmDeviceInfo'
 
-import { CredoError, InjectionSymbols, TransportService, inject, injectable } from '@credo-ts/core'
+import { CredoError, InjectionSymbols, RecordDuplicateError, TransportService, inject, injectable } from '@credo-ts/core'
 
 import { PushNotificationsFcmProblemReportError, PushNotificationsFcmProblemReportReason } from '../errors'
 import { PushNotificationsFcmDeviceInfoMessage, PushNotificationsFcmSetDeviceInfoMessage } from '../messages'
 import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../repository'
 
+
+interface NotificationMessage {
+  messageType: string;
+  token: string;
+  clientCode: string;
+}
 @injectable()
 export class PushNotificationsFcmService {
   private pushNotificationsFcmRepository: PushNotificationsFcmRepository
@@ -29,12 +35,13 @@ export class PushNotificationsFcmService {
       (deviceInfo.deviceToken === null && deviceInfo.devicePlatform !== null) ||
       (deviceInfo.deviceToken !== null && deviceInfo.devicePlatform === null)
     )
-      throw new CredoError('Both or none of deviceToken and devicePlatform must be null')
+      throw new CredoError('Both or none of deviceToken and devicePlatform must be null') // Why?
 
     return new PushNotificationsFcmDeviceInfoMessage({
       threadId,
       deviceToken: deviceInfo.deviceToken,
       devicePlatform: deviceInfo.devicePlatform,
+      clientCode: deviceInfo.clientCode
     })
   }
 
@@ -73,9 +80,70 @@ export class PushNotificationsFcmService {
         connectionId: connection.id,
         deviceToken: message.deviceToken,
         devicePlatform: message.devicePlatform,
+        clientCode: message.clientCode
       })
 
       await this.pushNotificationsFcmRepository.save(agentContext, pushNotificationsFcmRecord)
     }
+  }
+
+  public async sendNotification(agentContext: AgentContext, connectionId: string, messageType: string) {
+    try {
+
+      // Not sure how required this is...
+      // Get the session for the connection
+      // const session = await this.transportService.findSessionByConnectionId(connectionId)
+
+      // if (session) {
+      //   this.logger.info(`Connection ${connectionId} is active. So skip sending notification`)
+      //   return
+      // }
+
+      // Get the device token for the connection
+      const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
+        connectionId,
+      })
+
+      if (!pushNotificationFcmRecord?.deviceToken) {
+        this.logger.info(`No device token found for connectionId so skip sending notification`)
+        return
+      }
+
+
+      // Prepare a message to be sent to the device
+      const message: NotificationMessage = {
+        messageType,
+        token: pushNotificationFcmRecord?.deviceToken || '',
+        clientCode: pushNotificationFcmRecord?.clientCode || ''
+      }
+
+      this.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)
+      await this.processNotification(message);
+      // await admin.messaging().send(message)
+      this.logger.info(`Notification sent successfully to ${connectionId}`)
+    } catch (error) {
+      if (error instanceof RecordDuplicateError) {
+        this.logger.error(`Multiple device info found for connectionId ${connectionId}`)
+      } else {
+        this.logger.error(`Error sending notification`, {
+          cause: error,
+        })
+      }
+    }
+  }
+
+  public async processNotification(message: NotificationMessage) {
+  }
+
+  public async getDeviceInfo(agentContext: AgentContext, connectionId: string) {
+    const pushNotificationsFcmRecord = await this.pushNotificationsFcmRepository.getSingleByQuery(agentContext, {
+      connectionId,
+    })
+
+    if (!pushNotificationsFcmRecord) {
+      console.error(`No device info found for connection ${connectionId}`)
+    }
+
+    return pushNotificationsFcmRecord
   }
 }
