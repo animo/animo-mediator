@@ -21,14 +21,8 @@ export class PushNotificationsFcmSetDeviceInfoMessage extends AgentMessage {
       this.id = options.id ?? this.generateId()
       this.deviceToken = options.deviceToken
       this.devicePlatform = options.devicePlatform
-      this.clientCode = options.clientCode
     }
   }
-
-  @Expose({ name: 'client_code' })
-  @IsString()
-  @ValidateIf((object, value) => value !== null)
-  public clientCode!: string | null
 
   @Expose({ name: 'device_token' })
   @IsString()

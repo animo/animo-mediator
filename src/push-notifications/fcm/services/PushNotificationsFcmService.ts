@@ -11,7 +11,6 @@ import { PushNotificationsFcmRecord, PushNotificationsFcmRepository } from '../r
 interface NotificationMessage {
   messageType: string;
   token: string;
-  clientCode: string;
 }
 @injectable()
 export class PushNotificationsFcmService {
@@ -41,7 +40,6 @@ export class PushNotificationsFcmService {
       threadId,
       deviceToken: deviceInfo.deviceToken,
       devicePlatform: deviceInfo.devicePlatform,
-      clientCode: deviceInfo.clientCode
     })
   }
 
@@ -80,7 +78,6 @@ export class PushNotificationsFcmService {
         connectionId: connection.id,
         deviceToken: message.deviceToken,
         devicePlatform: message.devicePlatform,
-        clientCode: message.clientCode
       })
 
       await this.pushNotificationsFcmRepository.save(agentContext, pushNotificationsFcmRecord)
@@ -114,7 +111,6 @@ export class PushNotificationsFcmService {
       const message: NotificationMessage = {
         messageType,
         token: pushNotificationFcmRecord?.deviceToken || '',
-        clientCode: pushNotificationFcmRecord?.clientCode || ''
       }
 
       this.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)

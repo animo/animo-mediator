@@ -14,7 +14,6 @@ export interface PushNotificationsFcmStorageProps {
   devicePlatform: string | null
   connectionId: string
   tags?: CustomPushNotificationsFcmTags
-  clientCode: string | null
 }
 
 export class PushNotificationsFcmRecord extends BaseRecord<
@@ -26,7 +25,6 @@ export class PushNotificationsFcmRecord extends BaseRecord<
   public connectionId!: string
   public static readonly type = 'PushNotificationsFcmRecord'
   public readonly type = PushNotificationsFcmRecord.type
-  public clientCode!: string | null
 
   public constructor(props: PushNotificationsFcmStorageProps) {
     super()
@@ -37,7 +35,6 @@ export class PushNotificationsFcmRecord extends BaseRecord<
       this.deviceToken = props.deviceToken
       this.connectionId = props.connectionId
       this._tags = props.tags ?? {}
-      this.clientCode = props.clientCode
     }
   }
 
