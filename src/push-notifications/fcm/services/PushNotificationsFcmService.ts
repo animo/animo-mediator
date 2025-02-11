@@ -34,7 +34,7 @@ export class PushNotificationsFcmService {
       (deviceInfo.deviceToken === null && deviceInfo.devicePlatform !== null) ||
       (deviceInfo.deviceToken !== null && deviceInfo.devicePlatform === null)
     )
-      throw new CredoError('Both or none of deviceToken and devicePlatform must be null') // Why?
+      throw new CredoError('Both or none of deviceToken and devicePlatform must be null')
 
     return new PushNotificationsFcmDeviceInfoMessage({
       threadId,
@@ -87,15 +87,6 @@ export class PushNotificationsFcmService {
   public async sendNotification(agentContext: AgentContext, connectionId: string, messageType: string) {
     try {
 
-      // Not sure how required this is...
-      // Get the session for the connection
-      // const session = await this.transportService.findSessionByConnectionId(connectionId)
-
-      // if (session) {
-      //   this.logger.info(`Connection ${connectionId} is active. So skip sending notification`)
-      //   return
-      // }
-
       // Get the device token for the connection
       const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
         connectionId,
@@ -113,10 +104,7 @@ export class PushNotificationsFcmService {
         token: pushNotificationFcmRecord?.deviceToken || '',
       }
 
-      this.logger.info(`Sending notification to ${pushNotificationFcmRecord?.connectionId}`)
       await this.processNotification(message);
-      // await admin.messaging().send(message)
-      this.logger.info(`Notification sent successfully to ${connectionId}`)
     } catch (error) {
       if (error instanceof RecordDuplicateError) {
         this.logger.error(`Multiple device info found for connectionId ${connectionId}`)
@@ -126,9 +114,6 @@ export class PushNotificationsFcmService {
         })
       }
     }
-  }
-
-  public async processNotification(message: NotificationMessage) {
   }
 
   public async getDeviceInfo(agentContext: AgentContext, connectionId: string) {
