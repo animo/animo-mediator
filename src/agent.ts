@@ -17,13 +17,13 @@ import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 import express from 'express'
 import { Server } from 'ws'
 
+import admin, { credential } from 'firebase-admin'
 import config from './config'
 import { askarPostgresConfig } from './database'
+import { routingEvents } from './events/RoutingEvents'
 import { Logger } from './logger'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
-import { routingEvents } from './events/Routingevents'
-import admin, { credential } from 'firebase-admin'
 
 function createModules() {
   const modules = {

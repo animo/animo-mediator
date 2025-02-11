@@ -1,11 +1,11 @@
-import admin from 'firebase-admin'
+import { app } from 'firebase-admin'
 import { Logger } from '../logger'
 import { PushNotificationsFcmRecord } from '../push-notifications/fcm/repository'
 
 export const sendNotificationEvent = async (
   pushNotificationFcmRecord: PushNotificationsFcmRecord,
   logger: Logger,
-  admin: admin.app.App
+  admin: app.App
 ) => {
   try {
     if (!pushNotificationFcmRecord?.deviceToken) {
