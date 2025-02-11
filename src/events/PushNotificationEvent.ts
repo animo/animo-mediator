@@ -1,7 +1,12 @@
-import { PushNotificationsFcmRecord } from '../push-notifications/fcm/repository'
+import admin from 'firebase-admin'
 import { Logger } from '../logger'
+import { PushNotificationsFcmRecord } from '../push-notifications/fcm/repository'
 
-export const sendNotificationEvent = async (pushNotificationFcmRecord: PushNotificationsFcmRecord, logger: Logger, admin: any) => {
+export const sendNotificationEvent = async (
+  pushNotificationFcmRecord: PushNotificationsFcmRecord,
+  logger: Logger,
+  admin: admin.app.App
+) => {
   try {
     if (!pushNotificationFcmRecord?.deviceToken) {
       logger.info(`No device token found for connectionId ${pushNotificationFcmRecord.connectionId}`)
@@ -11,13 +16,13 @@ export const sendNotificationEvent = async (pushNotificationFcmRecord: PushNotif
       token: pushNotificationFcmRecord.deviceToken,
       notification: {
         title: process.env.PUSH_NOTIFICATION_TITLE ?? 'title',
-        body: process.env.PUSH_NOTIFICATION_BODY ?? 'body'
-      }
+        body: process.env.PUSH_NOTIFICATION_BODY ?? 'body',
+      },
     })
 
     return response
   } catch (error) {
-    logger.error(`Error sending notification`, {
+    logger.error('Error sending notification', {
       cause: error,
     })
   }

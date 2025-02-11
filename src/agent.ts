@@ -23,7 +23,7 @@ import { Logger } from './logger'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
 import { routingEvents } from './events/Routingevents'
-import admin, { credential } from 'firebase-admin';
+import admin, { credential } from 'firebase-admin'
 
 function createModules() {
   const modules = {
@@ -152,16 +152,15 @@ export async function createAgent() {
       logger.info('Initializing firebase admin...')
 
       admin.initializeApp({
-        credential:
-          credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY
-          })
+        credential: credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY,
+        }),
       })
     }
     // add routing events
-    routingEvents(agent, admin)
+    routingEvents(agent, admin.app())
   }
 
   return agent
