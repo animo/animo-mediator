@@ -21,7 +21,7 @@ export const routingEvents = async (agent: MediatorAgent, admin: any) => {
             // Send notification to device
             await sendNotificationEvent(deviceRecord, agent.config.logger as any, admin)
         } catch (e) {
-            agent.config.logger.error('Record not found')
+            agent.config.logger.error('Error sending push notification', e as any)
         }
     })
 }
