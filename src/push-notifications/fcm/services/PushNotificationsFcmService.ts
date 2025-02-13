@@ -77,7 +77,7 @@ export class PushNotificationsFcmService {
     }
   }
 
-  public async getDeviceInfo(agentContext: AgentContext, connectionId: string) {
+  public async getPushNotificationRecordByConnectionId(agentContext: AgentContext, connectionId: string) {
     const pushNotificationsFcmRecord = await this.pushNotificationsFcmRepository.getSingleByQuery(agentContext, {
       connectionId,
     })
