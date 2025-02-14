@@ -64,6 +64,6 @@ export class PushNotificationsFcmApi {
    * @returns Promise<PushNotificationsFcmRecord>
    */
   public async getDeviceInfoByConnectionId(connectionId: string) {
-    return this.pushNotificationsService.getDeviceInfo(this.agentContext, connectionId)
+    return this.pushNotificationsService.getPushNotificationRecordByConnectionId(this.agentContext, connectionId)
   }
 }

@@ -17,10 +17,8 @@ import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 import express from 'express'
 import { Server } from 'ws'
 
-import admin, { credential } from 'firebase-admin'
 import config from './config'
 import { askarPostgresConfig } from './database'
-import { routingEvents } from './events/RoutingEvents'
 import { Logger } from './logger'
 import { PushNotificationsFcmModule } from './push-notifications/fcm'
 import { StorageMessageQueueModule } from './storage/StorageMessageQueueModule'
@@ -145,23 +143,6 @@ export async function createAgent() {
       socketServer.emit('connection', socket, request)
     })
   })
-
-  if (process.env.USE_PUSH_NOTIFICATIONS === 'true') {
-    // Initialize Firebase Cloud Messaging app
-    if (!admin.apps.length) {
-      logger.info('Initializing firebase admin...')
-
-      admin.initializeApp({
-        credential: credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY,
-        }),
-      })
-    }
-    // add routing events
-    routingEvents(agent, admin.app())
-  }
 
   return agent
 }
