@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "description": "Credo mediator agent",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "style:check:all": "pnpm -r style:check",
+    "types:check:all": "pnpm -r types:check",
+    "style:fix:all": "pnpm -r style:fix",
+    "build:all": "pnpm -r build",
+    "test:all": "pnpm -r test"
   },
   "keywords": [],
   "author": "",
