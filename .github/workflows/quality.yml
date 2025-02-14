@@ -30,8 +30,8 @@ jobs:
       - name: Check Types
         run: pnpm types:check:all
 
-      # - name: Compile
-      #   run: pnpm build:all
+      - name: Compile
+        run: pnpm build:all
 
   tests:
     runs-on: ubuntu-20.04
