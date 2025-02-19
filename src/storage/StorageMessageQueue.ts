@@ -97,7 +97,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       await this.sendNotification(this.agentContext, connectionId, 'messageType')
     }
 
-    if (config.get('agent:usePushNotifications')) {
+    // Send a Firebase Cloud Message notification to the device
+    if (config.get('agent:usePushNotifications') && process.env.FIREBASE_PROJECT_ID) {
       await this.sendFCMNotification(this.agentContext, connectionId)
     }
 
