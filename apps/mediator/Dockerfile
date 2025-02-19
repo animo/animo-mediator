@@ -11,25 +11,37 @@ WORKDIR /build
 
 COPY . /build
 
+# RUN pnpm install
+
+# RUN ls -lah /build
+# RUN ls -lah /build/apps/mediator
+# RUN ls -lah /build/apps/mediator/node_modules
+# RUN ls -lah /build/apps/mediator/node_modules/.bin
+
+# RUN pnpm prune --prod --node-linker=hoisted
+
 RUN pnpm install --node-linker=hoisted && \
   pnpm --filter didcomm-mediator-service build && \
-  pnpm prune --prod 
+  pnpm prune --prod
 
-FROM base AS final
+# FROM base AS final
 
-WORKDIR /app
+# WORKDIR /app
 
 # # Copy build
-COPY --from=setup /build/apps/mediator/build /app/build
-COPY --from=setup /build/apps/mediator/node_modules /app/node_modules
-COPY --from=setup /build/apps/mediator/package.json /app
 
-# Don't run production as root
-RUN addgroup --system --gid 1001 agent && \
-  adduser --system --uid 1001 agent && \
-  mkdir -p /nonexistent && \
-  chown agent:agent /nonexistent
+# RUN ls -lah /build/apps/mediator/build
 
-USER agent
+# COPY --from=setup /build/apps/mediator/build /app/build
+# COPY --from=setup /build/apps/mediator/node_modules /app/node_modules
+# COPY --from=setup /build/apps/mediator/package.json /app
+
+# # Don't run production as root
+# RUN addgroup --system --gid 1001 agent && \
+#   adduser --system --uid 1001 agent && \
+#   mkdir -p /nonexistent && \
+#   chown agent:agent /nonexistent
+
+# USER agent
 
 ENTRYPOINT [ "node", "build/index.js" ]
