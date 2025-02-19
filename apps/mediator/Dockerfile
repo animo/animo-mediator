@@ -15,24 +15,24 @@ RUN pnpm install --node-linker=local && \
   pnpm --filter didcomm-mediator-service build && \
   pnpm prune --prod
 
-# FROM base AS final
+FROM base AS final
 
-# WORKDIR /app
+WORKDIR /app
 
-# # Copy build
+# Copy build
 
-# RUN ls -lah /build/apps/mediator/build
+RUN ls -lah /build/apps/mediator/build
 
-# COPY --from=setup /build/apps/mediator/build /app/build
-# COPY --from=setup /build/apps/mediator/node_modules /app/node_modules
-# COPY --from=setup /build/apps/mediator/package.json /app
+COPY --from=setup /build/apps/mediator/build /app/build
+COPY --from=setup /build/apps/mediator/node_modules /app/node_modules
+COPY --from=setup /build/apps/mediator/package.json /app
 
-# # Don't run production as root
-# RUN addgroup --system --gid 1001 agent && \
-#   adduser --system --uid 1001 agent && \
-#   mkdir -p /nonexistent && \
-#   chown agent:agent /nonexistent
+# Don't run production as root
+RUN addgroup --system --gid 1001 agent && \
+  adduser --system --uid 1001 agent && \
+  mkdir -p /nonexistent && \
+  chown agent:agent /nonexistent
 
-# USER agent
+USER agent
 
 ENTRYPOINT [ "node", "build/index.js" ]
