@@ -11,7 +11,7 @@ WORKDIR /build
 
 COPY . /build
 
-RUN pnpm install --node-linker=local && \
+RUN pnpm install --node-linker=hoisted && \
   pnpm --filter didcomm-mediator-service build && \
   pnpm prune --prod
 
@@ -20,7 +20,6 @@ FROM base AS final
 WORKDIR /app
 
 # Copy build
-
 COPY --from=setup /build/apps/mediator/build /app/build
 COPY --from=setup /build/apps/mediator/node_modules /app/node_modules
 COPY --from=setup /build/apps/mediator/package.json /app
