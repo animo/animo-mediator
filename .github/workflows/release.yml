@@ -33,7 +33,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           image_name: "${{ github.repository }}/mediator"
-          context: ./apps/mediator
+          context: ./
           dockerfile: "Dockerfile"
           docker_user: ${{ github.actor }}
           docker_password: ${{ secrets.GITHUB_TOKEN }}
