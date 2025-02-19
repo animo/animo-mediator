@@ -11,16 +11,7 @@ WORKDIR /build
 
 COPY . /build
 
-# RUN pnpm install
-
-# RUN ls -lah /build
-# RUN ls -lah /build/apps/mediator
-# RUN ls -lah /build/apps/mediator/node_modules
-# RUN ls -lah /build/apps/mediator/node_modules/.bin
-
-# RUN pnpm prune --prod --node-linker=hoisted
-
-RUN pnpm install --node-linker=hoisted && \
+RUN pnpm install --node-linker=local && \
   pnpm --filter didcomm-mediator-service build && \
   pnpm prune --prod
 
