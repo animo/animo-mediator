@@ -14,6 +14,8 @@ import { MessageRecord } from './MessageRecord'
 import { MessageRepository } from './MessageRepository'
 
 import config from '../config'
+import { sendFCMPushNotification } from '../events/PushNotificationEvent'
+import { Logger } from '../logger'
 
 export interface NotificationMessage {
   messageType: string
@@ -53,8 +55,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
 
     const messagesToTake = limit ?? messageRecords.length
     this.agentContext.config.logger.debug(
-      `Taking ${messagesToTake} messages from queue for connection ${connectionId} (of total ${
-        messageRecords.length
+      `Taking ${messagesToTake} messages from queue for connection ${connectionId} (of total ${messageRecords.length
       }) with deleteMessages=${String(deleteMessages)}`
     )
 
@@ -96,6 +97,11 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
       await this.sendNotification(this.agentContext, connectionId, 'messageType')
     }
 
+    // Send a Firebase Cloud Message notification to the device
+    if (config.get('agent:usePushNotifications') && process.env.FIREBASE_PROJECT_ID) {
+      await this.sendFCMNotification(this.agentContext, connectionId)
+    }
+
     return id
   }
 
@@ -109,6 +115,29 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
     )
 
     await Promise.all(deletePromises)
+  }
+
+  private async sendFCMNotification(agentContext: AgentContext, connectionId: string) {
+    // Get the device token for the connection
+    const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
+      connectionId,
+    })
+
+    if (!pushNotificationFcmRecord?.deviceToken) {
+      this.agentContext.config.logger.info('No device token found for connectionId so skip sending notification')
+      return
+    }
+
+    try {
+      this.agentContext.config.logger.info(`Sending FCM notification to ${pushNotificationFcmRecord?.connectionId}`)
+      // Found record, send firebase push notification
+      await sendFCMPushNotification(pushNotificationFcmRecord, agentContext.config.logger as Logger)
+      this.agentContext.config.logger.info(`FCM push notification sent successfully to ${connectionId}`)
+    } catch (error) {
+      this.agentContext.config.logger.error('Error sending FCM notification', {
+        cause: error,
+      })
+    }
   }
 
   private async sendNotification(agentContext: AgentContext, connectionId: string, messageType?: string) {
