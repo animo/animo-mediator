@@ -55,8 +55,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
 
     const messagesToTake = limit ?? messageRecords.length
     this.agentContext.config.logger.debug(
-      `Taking ${messagesToTake} messages from queue for connection ${connectionId} (of total ${
-        messageRecords.length
+      `Taking ${messagesToTake} messages from queue for connection ${connectionId} (of total ${messageRecords.length
       }) with deleteMessages=${String(deleteMessages)}`
     )
 
@@ -99,7 +98,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
     }
 
     if (config.get('agent:usePushNotifications')) {
-      await this.sendFCMNotification(this.agentContext, connectionId, 'type')
+      await this.sendFCMNotification(this.agentContext, connectionId)
     }
 
     return id
@@ -117,7 +116,7 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
     await Promise.all(deletePromises)
   }
 
-  private async sendFCMNotification(agentContext: AgentContext, connectionId: string, messageType?: string) {
+  private async sendFCMNotification(agentContext: AgentContext, connectionId: string) {
     // Get the device token for the connection
     const pushNotificationFcmRecord = await this.pushNotificationsFcmRepository.findSingleByQuery(agentContext, {
       connectionId,
