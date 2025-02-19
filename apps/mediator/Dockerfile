@@ -1,44 +1,34 @@
 FROM node:20 AS base
 
-WORKDIR /app
-
 RUN apt-get update && \
   apt-get upgrade -y && \ 
+  npm install -g corepack@latest && \
   corepack enable
 
 FROM base AS setup
 
-# Copy root package files
-COPY package.json /app/package.json
-COPY pnpm-lock.yaml /app/pnpm-lock.yaml
-COPY patches /app/patches
+WORKDIR /build
 
-# Run yarn install
-RUN pnpm install
+COPY . /build
 
-COPY . /app
-
-RUN pnpm build
+RUN pnpm install --node-linker=hoisted && \
+  pnpm --filter didcomm-mediator-service build && \
+  pnpm prune --prod 
 
 FROM base AS final
 
 WORKDIR /app
 
-# Copy build
-COPY --from=setup /app/build /app/build
-
-COPY package.json /app/package.json
-COPY pnpm-lock.yaml /app/pnpm-lock.yaml
-COPY patches /app/patches
-
-# Package yarn install and prune to
-# reduce image size
-RUN pnpm install --production && \
-  pnpm store prune
+# # Copy build
+COPY --from=setup /build/apps/mediator/build /app/build
+COPY --from=setup /build/apps/mediator/node_modules /app/node_modules
+COPY --from=setup /build/apps/mediator/package.json /app
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 agent && \
-  adduser --system --uid 1001 agent
+  adduser --system --uid 1001 agent && \
+  mkdir -p /nonexistent && \
+  chown agent:agent /nonexistent
 
 USER agent
 
