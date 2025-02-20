@@ -13,7 +13,7 @@ WORKDIR /build
 
 COPY . /build
 
-RUN pnpm install --node-linker=hoisted && \
+RUN pnpm install --node-linker=hoisted --frozen-lockfile && \
   pnpm --filter didcomm-mediator-service build && \
   pnpm prune --prod
 
