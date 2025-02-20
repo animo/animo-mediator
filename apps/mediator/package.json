@@ -51,10 +51,5 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@credo-ts/core": "patches/@credo-ts__core.patch"
-    }
   }
 }
