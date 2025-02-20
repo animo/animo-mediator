@@ -55,7 +55,8 @@ export class StorageServiceMessageQueue implements MessagePickupRepository {
 
     const messagesToTake = limit ?? messageRecords.length
     this.agentContext.config.logger.debug(
-      `Taking ${messagesToTake} messages from queue for connection ${connectionId} (of total ${messageRecords.length
+      `Taking ${messagesToTake} messages from queue for connection ${connectionId} (of total ${
+        messageRecords.length
       }) with deleteMessages=${String(deleteMessages)}`
     )
 
