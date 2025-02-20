@@ -20,8 +20,8 @@ FROM base AS final
 WORKDIR /app
 
 # Copy build
-COPY --from=setup /build/apps/mediator/build /app/build
 COPY --from=setup /build/node_modules /app/node_modules
+COPY --from=setup /build/apps/mediator/build /app/build
 COPY --from=setup /build/apps/mediator/package.json /app
 
 # Don't run production as root
