@@ -18,7 +18,7 @@ services:
       - local_credo_mediator_network
 
   mediator:
-    image: mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye
+    image: mcr.microsoft.com/devcontainers/javascript-node:22-bullseye
     working_dir: /work
     volumes:
       - ../:/work

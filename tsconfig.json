@@ -6,8 +6,14 @@
   "compilerOptions": {
     "jsx": "preserve",
     "baseUrl": ".",
-    "types": ["jest", "node"],
+    "types": [
+      "jest",
+      "node"
+    ],
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", "build"]
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
 }
