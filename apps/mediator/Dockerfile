@@ -3,9 +3,11 @@ FROM node:22 AS base
 RUN apt-get update && \
   apt-get upgrade -y && \ 
   npm install -g corepack@latest && \
-  corepack enable
+  corepack enable && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
-FROM base AS setup
+FROM base AS build
 
 WORKDIR /build
 
@@ -20,9 +22,9 @@ FROM base AS final
 WORKDIR /app
 
 # Copy build
-COPY --from=setup /build/node_modules /app/node_modules
-COPY --from=setup /build/apps/mediator/build /app/build
-COPY --from=setup /build/apps/mediator/package.json /app
+COPY --from=build /build/node_modules /app/node_modules
+COPY --from=build /build/apps/mediator/build /app/build
+COPY --from=build /build/apps/mediator/package.json /app
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 agent && \
