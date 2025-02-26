@@ -1,0 +1,21 @@
+@startuml
+title Message arrived for an offline client
+
+participant CA1 as "Mediator App"
+participant CC1 as "Credo Core"
+participant CP1 as "PostgresMessagePickupRepository" 
+database PG as "Postgres DB"
+
+CC1 -> CP1: addMessage(connection1, msg1)
+CP1 -> CP1: look into local sessions
+CP1 -> PG: Store message(connection1, msg1, 'pending')
+CP1 -> PG: look into ongoing sessions
+note left
+Here we suppose that connection1
+is not connected
+end note
+CP1 -> CA1: connectionInfoCallback(connection1)
+CA1 --> CP1: sendPushNotification callback
+CA1 <- CP1: sendPushNotification(messageId)
+
+@enduml

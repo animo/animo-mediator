@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["jest"]
+  },
+  "@2060.io/credo-ts-message-pickup-repository-pg": ["packages/postgres/src"]
+}
