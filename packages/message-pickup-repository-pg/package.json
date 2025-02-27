@@ -1,8 +1,8 @@
 {
-  "name": "@2060.io/credo-ts-message-pickup-repository-pg",
+  "name": "@credo-ts/message-pickup-repository-pg",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
-  "version": "0.0.7",
+  "version": "0.0.1",
   "files": [
     "build"
   ],
@@ -11,11 +11,11 @@
   },
   "description": "Message Pickup Repository Postgres module",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/2060-io/message-pickup-repository/tree/main/packages/postgres",
+  "homepage": "https://github.com/openwallet-foundation/didcomm-mediator-credo/tree/main/packages/message-pickup-repository-pg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/2060-io/message-pickup-repository",
-    "directory": "packages/postgres"
+    "url": "https://github.com/openwallet-foundation/didcomm-mediator-credo",
+    "directory": "packages/message-pickup-repository-pg"
   },
   "scripts": {
   "build": "pnpm run clean && pnpm run compile",

@@ -46,11 +46,12 @@ This module is designed to work with Credo 0.5.X. Newer versions may include bre
 To use it, install package in your DIDComm Mediator application. For example:
 
 ```bash
-npm i @2060.io/credo-ts-message-pickup-repository-pg
+npm i @credo-ts/message-pickup-repository-pg
 ```
 or 
-```
-yarn add @2060.io/credo-ts-message-pickup-repository-pg
+
+```bash
+yarn add @credo-ts/message-pickup-repository-pg
 ```
 
 ## Usage
