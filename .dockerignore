@@ -1,0 +1,10 @@
+node_modules
+helm
+devops
+build
+.devcontainer
+.env
+.git
+.github
+.vscode
+.pnpm-store

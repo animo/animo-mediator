@@ -25,13 +25,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check Style
-        run: pnpm style:check
+        run: pnpm style:check:all
 
       - name: Check Types
-        run: pnpm types:check
+        run: pnpm types:check:all
 
       - name: Compile
-        run: pnpm build
+        run: pnpm build:all
 
   tests:
     runs-on: ubuntu-20.04
@@ -71,4 +71,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm test:all
