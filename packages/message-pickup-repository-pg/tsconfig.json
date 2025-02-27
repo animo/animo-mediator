@@ -1,0 +1,4 @@
+{
+  "extends": "../../tsconfig.json",
+  "@credo-ts/message-pickup-repository-pg": ["packages/message-pickup-repository-pg/src"]
+}
