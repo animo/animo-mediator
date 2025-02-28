@@ -1,5 +1,0 @@
-{
-  "packages/postgres": {
-    "release-type": "node"
-  }
-}
